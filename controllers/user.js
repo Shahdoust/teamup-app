@@ -20,4 +20,20 @@ const userSignUp = async (req, res) => {
   }
 };
 
-module.exports = { userSignUp };
+// Reset password
+const resetPassword = async (req, res) => {
+  const { email, password: NewPass, confirm_password } = req.body;
+
+  try {
+    const user = await User.resetPassword(email, NewPass, confirm_password);
+    if (!user) {
+      res.status(400).json({ msg: "The password did not reset check again" });
+    } else {
+      res.status(200).json(user);
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = { userSignUp, resetPassword };
