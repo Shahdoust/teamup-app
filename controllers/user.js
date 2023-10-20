@@ -5,7 +5,6 @@ const createToken = (_id) => {
   return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "1d" });
 };
 
-
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -39,7 +38,6 @@ const editUserInfo = async (req, res) => {
   }
 };
 
-
 // Signup user
 const userSignUp = async (req, res) => {
   const { email, password, username } = req.body;
@@ -70,5 +68,35 @@ const resetPasswordUser = async (req, res) => {
   }
 };
 
-module.exports = { userSignUp, resetPasswordUser, loginUser, editUserInfo };
+// View one profile user
+const viewOneUserProfile = async (req, res) => {
+  const id = req.params.id;
 
+  try {
+    const user = User.findOne({ _id: id });
+    if (user) {
+      res.status(200).json(user);
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// View all profile user
+const viewAllUserProfile = async (req, res) => {
+  try {
+    const user = User.find();
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = {
+  loginUser,
+  editUserInfo,
+  userSignUp,
+  resetPasswordUser,
+  viewOneUserProfile,
+  viewAllUserProfile,
+};
