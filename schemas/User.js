@@ -154,7 +154,45 @@ userSchema.statics.updateUserInfo = async function (userId, updatedInfo) {
   }
 };
 
-userSchema.methods.resetPassword = async function () {};
+userSchema.methods.resetPassword = async function (
+  email,
+  password,
+  confirm_password
+) {
+  const exists = await findOne({ email });
+
+  if (!exists) {
+    throw Error("Email is not exist");
+  }
+
+  if (!email) {
+    throw Error("Fill out the filled");
+  }
+
+  if (!validator.isEmail) {
+    throw Error("Email is not valid");
+  }
+
+  if (!validator.isStrongPassword) {
+    throw Error(
+      "Make sure to use at least 8 characters, one upper case letter, a number and a symbol"
+    );
+  }
+
+  if (password !== confirm_password) {
+    throw Error("Password is not matched");
+  }
+
+  const salt = await bcrypt.genSalt();
+  const hash = await bcrypt.hash(confirm_password, salt);
+  const user = await this.findOneAndUpdate(
+    { email },
+    { password: hash },
+    { new: true }
+  );
+
+  return user;
+};
 
 userSchema.methods.getUserEvents = function () {};
 
