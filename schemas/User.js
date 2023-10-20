@@ -27,17 +27,17 @@ const userSchema = new Schema({
       type: String,
     },
     location: {
-      LatLng: {
-        latitude: {
-          type: Number,
-          required: [true, "Please add latitude"],
-        },
+      // LatLng: {
+      //   latitude: {
+      //     type: Number,
+      //     required: [true, "Please add latitude"],
+      //   },
 
-        longitude: {
-          type: Number,
-          required: [true, "Please add longitude"],
-        },
-      },
+      //   longitude: {
+      //     type: Number,
+      //     required: [true, "Please add longitude"],
+      //   },
+      // },
       registrationDate: {
         type: Date,
         default: Date.now, // Automatically set registration date
@@ -87,7 +87,6 @@ const userSchema = new Schema({
 
 userSchema.statics.signup = async function (email, password, username) {
   const exists = await this.findOne({ email });
-
   if (exists) {
     throw Error("Email is already in use");
   }
@@ -103,9 +102,10 @@ userSchema.statics.signup = async function (email, password, username) {
       "Make sure to use at least 8 characters, one upper case letter, a number and a symbol"
     );
   }
+
   const salt = await bcrypt.genSalt();
   const hash = await bcrypt.hash(password, salt);
-  const user = await this.create({ username, email, password: hash });
+  const user = await this.create({ email, password: hash, username });
 
   return user;
 };
@@ -154,18 +154,18 @@ userSchema.statics.updateUserInfo = async function (userId, updatedInfo) {
   }
 };
 
-userSchema.methods.resetPassword = async function (
+userSchema.statics.resetPassword = async function (
   email,
   password,
   confirm_password
 ) {
-  const exists = await findOne({ email });
-
+  console.log(email, password, confirm_password);
+  const exists = await this.findOne({ email });
   if (!exists) {
     throw Error("Email is not exist");
   }
 
-  if (!email) {
+  if (!email || !password || !confirm_password) {
     throw Error("Fill out the filled");
   }
 
@@ -173,7 +173,7 @@ userSchema.methods.resetPassword = async function (
     throw Error("Email is not valid");
   }
 
-  if (!validator.isStrongPassword) {
+  if (!validator.isStrongPassword(password)) {
     throw Error(
       "Make sure to use at least 8 characters, one upper case letter, a number and a symbol"
     );
