@@ -27,31 +27,60 @@ const userSchema = new Schema({
       type: String,
     },
     location: {
-      type: {
+      LatLng: {
+        latitude: {
+          type: Number,
+          required: [true, "Please add latitude"],
+        },
+
+        longitude: {
+          type: Number,
+          required: [true, "Please add longitude"],
+        },
+      },
+      registrationDate: {
+        type: Date,
+        default: Date.now, // Automatically set registration date
+      },
+      userRating: {
+        type: Number,
+      },
+      interestedInSports: {
+        type: [String],
+      },
+      eventsOrganized: [
+        {
+          type: Schema.Types.ObjectId, //can be retrieved with populate() and exec() methods
+          ref: "Event", // look into mongoose ref and populate
+        },
+      ],
+      eventsAttended: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Event",
+        },
+      ],
+      eventsLiked: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Event",
+        },
+      ],
+      languagesSpoken: {
+        type: [String], //enum with languages
+        enum: [
+          "English",
+          "Spanish",
+          "French",
+          "German",
+          "Chinese",
+          "Japanese",
+          "Other",
+        ],
+      },
+      customLanguage: {
         type: String,
-        default: "Point", // For geospatial queries
       },
-      coordinates: {
-        type: [Number],
-        default: [13.405, 52.52], // [Longitude, Latitude] for Berlin
-      },
-    },
-    registrationDate: {
-      type: Date,
-      default: Date.now, // Automatically set registration date
-    },
-    userRating: {
-      type: Number,
-    },
-    interestedInSports: {
-      type: [String],
-    },
-    eventsOrganized: {
-      type: [Schema.Types.ObjectId], //can be retrieved with populate() and exec() methods
-      ref: "Event",
-    },
-    languageSpoken: {
-      type: [String],
     },
   },
 });
