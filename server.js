@@ -4,6 +4,9 @@ const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
+// app.use(express.urlencoded({ extended: true }));
+
+
 
 // Port used from .env
 const PORT = process.env.PORT;
@@ -24,13 +27,13 @@ app.use((req, res, next) => {
   next();
 });
 
+// User routes
+app.use("/user", userRoutes);
+
 // The root route
 app.get("/", (req, res) => {
   res.send("Welcome to our TeamUp App");
 });
-
-// User routes
-app.use("/user", userRoutes);
 
 // Listening to port
 app.listen(PORT, () => {

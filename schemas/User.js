@@ -27,61 +27,64 @@ const userSchema = new Schema({
       type: String,
     },
     location: {
-      // LatLng: {
-      //   latitude: {
-      //     type: Number,
-      //     required: [true, "Please add latitude"],
-      //   },
+      LatLng: {
+        latitude: {
+          type: Number,
+          required: [true, "Please add latitude"],
+        },
 
-      //   longitude: {
-      //     type: Number,
-      //     required: [true, "Please add longitude"],
-      //   },
-      // },
-      registrationDate: {
-        type: Date,
-        default: Date.now, // Automatically set registration date
-      },
-      userRating: {
-        type: Number,
-      },
-      interestedInSports: {
-        type: [String],
-      },
-      eventsOrganized: [
-        {
-          type: Schema.Types.ObjectId, //can be retrieved with populate() and exec() methods
-          ref: "Event", // look into mongoose ref and populate
+        longitude: {
+          type: Number,
+          required: [true, "Please add longitude"],
         },
-      ],
-      eventsAttended: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Event",
-        },
-      ],
-      eventsLiked: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Event",
-        },
-      ],
-      languagesSpoken: {
-        type: [String], //enum with languages
-        enum: [
-          "English",
-          "Spanish",
-          "French",
-          "German",
-          "Chinese",
-          "Japanese",
-          "Other",
-        ],
-      },
-      customLanguage: {
-        type: String,
       },
     },
+    registrationDate: {
+      type: Date,
+      default: Date.now, // Automatically set registration date
+    },
+    userRating: {
+      type: Number,
+    },
+    interestedInSports: [
+      {
+        type: String,
+      },
+    ],
+    eventsOrganized: [
+      {
+        type: Schema.Types.ObjectId, //can be retrieved with populate() and exec() methods
+        ref: "Event", // look into mongoose ref and populate
+      },
+    ],
+    eventsAttended: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Event",
+      },
+    ],
+    eventsLiked: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Event",
+      },
+    ],
+    languagesSpoken: {
+      type: [String], //enum with languages
+      enum: [
+        "English",
+        "Spanish",
+        "French",
+        "German",
+        "Chinese",
+        "Japanese",
+        "Other",
+      ],
+    },
+    customLanguage: {
+      type: String,
+    },
+    //},
   },
 });
 
@@ -122,10 +125,14 @@ userSchema.statics.login = async function (email, password) {
     throw Error("Incorrect email");
   }
 
-  const match = await bcrypt.compare(password, user.password);
+  // const match = await bcrypt.compare(password, user.password);
+  const match = await password.localeCompare(user.password); //this need to be changed to like 125 when signin works
 
-  if (!match) {
-    throw Error("Incorrect password");
+  // if (!match) {
+  //   throw Error("Incorrect password");
+  // }
+  if (match !== 0) {
+    throw Error("Incorrect password"); //this also
   }
 
   return user;
@@ -139,7 +146,7 @@ userSchema.statics.updateUserInfo = async function (userId, updatedInfo) {
 
   try {
     const updatedUser = await this.findByIdAndUpdate(
-      userId,
+      { _id: userId.id },
       { $set: { userInfo: updatedInfo } },
       { new: true }
     );
@@ -147,7 +154,7 @@ userSchema.statics.updateUserInfo = async function (userId, updatedInfo) {
     if (!updatedUser) {
       throw Error("user is not found");
     }
-
+    // await updatedUser.save();
     return updatedUser;
   } catch (err) {
     throw Error("Failed to update user info");
@@ -195,5 +202,7 @@ userSchema.statics.resetPassword = async function (
 };
 
 userSchema.methods.getUserEvents = function () {};
+
+//login and edit page
 
 module.exports = mongoose.model("User", userSchema);
