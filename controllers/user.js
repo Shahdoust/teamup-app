@@ -8,10 +8,10 @@ const createToken = (_id) => {
 
 // Signup user
 const userSignUp = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, username } = req.body;
 
   try {
-    const user = await User.signup(email, password);
+    const user = await User.signup(email, password, username);
     //create token
     const token = createToken(user._id);
     res.status(200).json({ email, token });
@@ -21,13 +21,13 @@ const userSignUp = async (req, res) => {
 };
 
 // Reset password
-const resetPassword = async (req, res) => {
+const resetPasswordUser = async (req, res) => {
   const { email, password: NewPass, confirm_password } = req.body;
 
   try {
     const user = await User.resetPassword(email, NewPass, confirm_password);
     if (!user) {
-      res.status(400).json({ msg: "The password did not reset check again" });
+      res.status(400).json({ msg: "Error resetting password" });
     } else {
       res.status(200).json(user);
     }
@@ -36,4 +36,4 @@ const resetPassword = async (req, res) => {
   }
 };
 
-module.exports = { userSignUp, resetPassword };
+module.exports = { userSignUp, resetPasswordUser };
