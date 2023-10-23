@@ -1,10 +1,9 @@
 const jwt = require("jsonwebtoken");
-const Event = require("../schemas/Event");
+const User = require("../schemas/User");
 
 // Check token if it is authorized
 const checkToken = async (req, res, next) => {
   const { authorization } = req.headers;
-
   if (!authorization) {
     return res.status(401).json({ error: "Unauthorized" });
   }
@@ -13,9 +12,8 @@ const checkToken = async (req, res, next) => {
 
   // Verify token
   try {
-    const { eventId } = jwt.verify(token, process.env.SECRET);
-    req.user = await Event.findOne({ _id: eventId });
-
+    const { _id } = jwt.verify(token, process.env.SECRET);
+    req.user = await User.findOne({ _id: _id }).select("_id");
     next();
   } catch (error) {
     console.log(error);
