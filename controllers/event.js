@@ -88,4 +88,4 @@ const deleteEvent = async (req, res) => {
   }
 };
 
-exports.module = { createEvent, getAllEvents, viewOneEvent, deleteEvent };
+module.exports = { createEvent, getAllEvents, viewOneEvent, deleteEvent };
