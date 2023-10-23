@@ -1,6 +1,7 @@
 const Event = require("../schemas/Event");
 const jwt = require("jsonwebtoken");
 
+
 // Create event for specific sport
 const createEvent = async (req, res) => {
   try {
@@ -63,6 +64,28 @@ const viewOneEvent = async (req, res) => {
   }
 };
 
+
+// Edit event
+const editEvent = async (req, res) => {
+  const updatedEventInformation = req.body;
+  const eventId = req.params.id;
+  //   console.log("hello from controller", eventId);
+  try {
+    const updatedEvent = await Event.findByIdAndUpdate(
+      eventId,
+      { $set: updatedEventInformation },
+      { new: true }
+    );
+    if (!updatedEvent) {
+      return res.status(404).json({ error: "event not found" });
+    }
+    await updatedEvent.save();
+    res.json(updatedEvent);
+  } catch (err) {
+    res.status(500).json({ err: "failed to update event :(" });
+  }
+};
+
 // Delete an event
 const deleteEvent = async (req, res) => {
   const eventId = req.params.eventId;
@@ -88,4 +111,4 @@ const deleteEvent = async (req, res) => {
   }
 };
 
-module.exports = { createEvent, getAllEvents, viewOneEvent, deleteEvent };
+module.exports = { createEvent, getAllEvents, viewOneEvent, deleteEvent, editEvent };
