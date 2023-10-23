@@ -7,7 +7,6 @@ const createToken = (_id) => {
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const user = await User.login(email, password);
 
@@ -55,7 +54,6 @@ const userSignUp = async (req, res) => {
 // Reset password
 const resetPasswordUser = async (req, res) => {
   const { email, password: NewPass, confirm_password } = req.body;
-
   try {
     const user = await User.resetPassword(email, NewPass, confirm_password);
     if (!user) {
@@ -72,10 +70,13 @@ const resetPasswordUser = async (req, res) => {
 const viewOneUserProfile = async (req, res) => {
   const id = req.params.id;
 
+  const { email } = req.query;
   try {
-    const user = User.findOne({ _id: id });
+    const user = await User.findOne({ email });
     if (user) {
       res.status(200).json(user);
+    } else {
+      return res.status(500).json({ msg: "User id not found" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -85,7 +86,7 @@ const viewOneUserProfile = async (req, res) => {
 // View all profile user
 const viewAllUserProfile = async (req, res) => {
   try {
-    const user = User.find();
+    const user = await User.find();
     res.status(200).json(user);
   } catch (error) {
     res.status(500).json({ error: error.message });
