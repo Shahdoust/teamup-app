@@ -6,14 +6,15 @@ const checkEventOwner = async (req, res, next) => {
   const eventId = req.params.id;
   const userId = req.user._id.toString();
 
-  // console.log("event id ", eventId);
-  // console.log("user request id ", userId);
-
   try {
     const event = await Event.findById(eventId).populate("organizator");
+    const user = await User.findById(userId); //find user to push the event into eventsOrganized
 
     const orgID = event.organizator._id.toString();
-    // console.log("organizator id ", orgID);
+
+    if (orgID === user._id.toString()) {
+      user.userInfo.eventsOrganized.push(event._id.toString());
+    } //pushes the event if user is creator (probably needs to be done in creating)
 
     if (!event || orgID !== userId) {
       return res
@@ -21,7 +22,7 @@ const checkEventOwner = async (req, res, next) => {
         .json({ error: "you are not authorized to update this event" });
     }
     // res.status(200).json(event);
-    //not sure about this
+    await user.save();
     next();
   } catch (err) {
     return res
