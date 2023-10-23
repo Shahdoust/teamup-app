@@ -3,14 +3,14 @@ const express = require("express");
 const userPermissionToEdit = require("../middlewares/editEventPermission");
 const requireAuth = require("../middlewares/requireAuth");
 
-app.get("/:id", viewOneEvent);
+// app.get("/:id", viewOneEvent);
 
 const {
   createEvent,
   getAllEvents,
   viewOneEvent,
   deleteEvent,
-    editEvent
+  editEvent,
 } = require("../controllers/event");
 
 const app = express.Router();
