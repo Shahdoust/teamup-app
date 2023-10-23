@@ -96,15 +96,16 @@ const editEvent = async (req, res) => {
 // Delete an event
 const deleteEvent = async (req, res) => {
   const eventId = req.params.eventId;
-  const userId = req.user.id;
+  const userId = req.user._id;
+
   try {
-    const event = await Event.findOne({ _id: eventId });
+    const event = await Event.find({ _id: eventId });
     if (!event) {
       return res.status(404).json({ msg: "Event not found" });
     }
 
     // Check if user is authorized
-    if (event.creator.toString() != userId) {
+    if (event[0].organizator.toString() != userId.toString()) {
       return res
         .status(403)
         .json({ msg: "You are not authorized to delete event" });
