@@ -72,10 +72,13 @@ const resetPasswordUser = async (req, res) => {
 const viewOneUserProfile = async (req, res) => {
   const id = req.params.id;
 
+  const { email } = req.query;
   try {
-    const user = User.findOne({ _id: id });
+    const user = await User.findOne({ email });
     if (user) {
       res.status(200).json(user);
+    } else {
+      return res.status(500).json({ msg: "User id not found" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
