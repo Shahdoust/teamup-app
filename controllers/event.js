@@ -35,16 +35,29 @@ const createEvent = async (req, res) => {
   }
 };
 
+// Get all events creator
+const getAllEvents = async (req, res) => {
+  try {
+    const events = await Event.find().populate("creator", "username");
+    if (!events) {
+      return res.status(200).json({ msg: "No events exist" });
+    }
+    res.status(200).json(events);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Get one event details by id
 const viewOneEvent = async (req, res) => {
   try {
     const id = req.params.id;
-    const event = await Event.findOne({ _id: id });
-    if (!event) {
+    const events = await Event.findOne({ _id: id });
+    if (!events) {
       return res.status(404).json({ msg: "Event not found" });
     }
 
-    res.status(200).json(event);
+    res.status(200).json(events);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -75,5 +88,4 @@ const deleteEvent = async (req, res) => {
   }
 };
 
-exports.module = { createEvent, viewOneEvent, deleteEvent };
-
+exports.module = { createEvent, getAllEvents, viewOneEvent, deleteEvent };
