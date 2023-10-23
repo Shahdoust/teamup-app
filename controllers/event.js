@@ -1,31 +1,39 @@
 const Event = require("../schemas/Event");
 const jwt = require("jsonwebtoken");
 
-
 // Create event for specific sport
 const createEvent = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id.toString();
     const {
       sportType,
+      usersInterested,
+      usersAttending,
       eventPicture,
       minimumRequiredAmountOfPpl,
       maxCapacity,
       location,
+      hashTags,
       eventDescription,
       eventDateAndTime,
+      organizator,
+      eventStatus,
     } = req.body;
     const creator = req.user;
 
     const event = await Event.create({
       sportType,
+      usersInterested,
+      usersAttending,
       eventPicture,
       minimumRequiredAmountOfPpl,
       maxCapacity,
       location,
+      hashTags,
       eventDescription,
       eventDateAndTime,
-      creator: userId,
+      organizator: userId,
+      eventStatus,
     });
 
     if (event) {
@@ -39,7 +47,7 @@ const createEvent = async (req, res) => {
 // Get all events creator
 const getAllEvents = async (req, res) => {
   try {
-    const events = await Event.find().populate("creator", "username");
+    const events = await Event.find().populate("organizator");
     if (!events) {
       return res.status(200).json({ msg: "No events exist" });
     }
@@ -63,7 +71,6 @@ const viewOneEvent = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 // Edit event
 const editEvent = async (req, res) => {
@@ -111,4 +118,10 @@ const deleteEvent = async (req, res) => {
   }
 };
 
-module.exports = { createEvent, getAllEvents, viewOneEvent, deleteEvent, editEvent };
+module.exports = {
+  createEvent,
+  getAllEvents,
+  viewOneEvent,
+  deleteEvent,
+  editEvent,
+};
