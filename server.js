@@ -6,8 +6,6 @@ require("dotenv").config();
 const app = express();
 // app.use(express.urlencoded({ extended: true }));
 
-
-
 // Port used from .env
 const PORT = process.env.PORT;
 
@@ -17,6 +15,9 @@ connectDB();
 
 // Call user routes
 const userRoutes = require("./routes/user");
+
+// Call event routes
+const eventRotes = require("./routes/event");
 
 // Necessary middleware
 app.use(cors());
@@ -29,6 +30,9 @@ app.use((req, res, next) => {
 
 // User routes
 app.use("/user", userRoutes);
+
+// Event routes
+app.use("/event", eventRotes);
 
 // The root route
 app.get("/", (req, res) => {
