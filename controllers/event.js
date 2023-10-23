@@ -36,10 +36,10 @@ const createEvent = async (req, res) => {
 };
 
 // Get one event details by id
-const getOneEventDetails = async (req, res) => {
+const viewOneEvent = async (req, res) => {
   try {
-    const eventId = req.params.eventId;
-    const event = await Event.findById({ eventId });
+    const id = req.params.id;
+    const event = await Event.findOne({ _id: id });
     if (!event) {
       return res.status(404).json({ msg: "Event not found" });
     }
@@ -75,4 +75,5 @@ const deleteEvent = async (req, res) => {
   }
 };
 
-exports.module = { createEvent, getOneEventDetails, deleteEvent };
+exports.module = { createEvent, viewOneEvent, deleteEvent };
+
