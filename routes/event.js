@@ -1,9 +1,16 @@
 const express = require("express");
 
-const { viewOneEvent } = require("../controllers/event");
+const {
+  createEvent,
+  getAllEvents,
+  viewOneEvent,
+  deleteEvent,
+} = require("../controllers/event");
 
 const app = express.Router();
 
-app.get("/:id", viewOneEvent);
+app.post("/", createEvent);
+app.route("/eventId").get(viewOneEvent).delete(deleteEvent);
+app.get("/", getAllEvents);
 
 module.exports = app;
