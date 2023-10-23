@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const createToken = (_id) => {
   return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "1d" });
 };
-
+//login user
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -21,7 +21,7 @@ const loginUser = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
-
+//edit or fill up full user info
 const editUserInfo = async (req, res) => {
   const updatedUserInformation = req.body;
   const userId = req.params;

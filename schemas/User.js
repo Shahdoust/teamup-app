@@ -30,12 +30,12 @@ const userSchema = new Schema({
       LatLng: {
         latitude: {
           type: Number,
-          required: [true, "Please add latitude"],
+          // required: [true, "Please add latitude"],
         },
 
         longitude: {
           type: Number,
-          required: [true, "Please add longitude"],
+          // required: [true, "Please add longitude"],
         },
       },
     },
@@ -125,15 +125,16 @@ userSchema.statics.login = async function (email, password) {
     throw Error("Incorrect email");
   }
 
-  // const match = await bcrypt.compare(password, user.password);
-  const match = await password.localeCompare(user.password); //this need to be changed to like 125 when signin works
+  const match = await bcrypt.compare(password, user.password);
+  // const match = await password.localeCompare(user.password);
+  //this need to be changed to like 125 when signin works
 
-  // if (!match) {
-  //   throw Error("Incorrect password");
-  // }
-  if (match !== 0) {
-    throw Error("Incorrect password"); //this also
+  if (!match) {
+    throw Error("Incorrect password");
   }
+  // if (match !== 0) {
+  //   throw Error("Incorrect password"); //this also
+  // }
 
   return user;
 };
