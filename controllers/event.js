@@ -48,7 +48,6 @@ const createEvent = async (req, res) => {
 
 // Get all events creator
 const getAllEvents = async (req, res) => {
-  const userId = req.user._id;
   try {
     const events = await Event.find();
 
@@ -65,8 +64,8 @@ const getAllEvents = async (req, res) => {
 // Get one event details by id
 const viewOneEvent = async (req, res) => {
   try {
-    const id = req.params.id;
-    const events = await Event.findOne({ _id: id });
+    const eventId = req.params.eventId;
+    const events = await Event.findOne({ _id: eventId });
     if (!events) {
       return res.status(404).json({ msg: "Event not found" });
     }
