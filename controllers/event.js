@@ -1,6 +1,5 @@
 const Event = require("../schemas/Event");
 const User = require("../schemas/User");
-const jwt = require("jsonwebtoken");
 
 // Create event for specific sport
 const createEvent = async (req, res) => {
@@ -20,7 +19,6 @@ const createEvent = async (req, res) => {
       organizator,
       eventStatus,
     } = req.body;
-    const creator = req.user;
 
     const event = await Event.create({
       sportType,
@@ -38,6 +36,9 @@ const createEvent = async (req, res) => {
     });
 
     if (event) {
+      const user = await User.findByIdAndUpdate(req.user._id, {
+        $push: { "userInfo.eventsOrganized": event._id },
+      });
       res.status(201).json(event);
     }
   } catch (error) {
@@ -47,8 +48,11 @@ const createEvent = async (req, res) => {
 
 // Get all events creator
 const getAllEvents = async (req, res) => {
+  const userId = req.user._id;
   try {
-    const events = await Event.find().populate("organizator");
+    const events = await Event.find();
+
+    console.log(events.length);
     if (!events) {
       return res.status(200).json({ msg: "No events exist" });
     }

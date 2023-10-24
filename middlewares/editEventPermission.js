@@ -12,16 +12,11 @@ const checkEventOwner = async (req, res, next) => {
 
     const orgID = event.organizator._id.toString();
 
-    if (orgID === user._id.toString()) {
-      user.userInfo.eventsOrganized.push(event._id.toString());
-    } //pushes the event if user is creator (probably needs to be done in creating)
-
     if (!event || orgID !== userId) {
       return res
         .status(403)
         .json({ error: "you are not authorized to update this event" });
     }
-    // res.status(200).json(event);
     await user.save();
     next();
   } catch (err) {
