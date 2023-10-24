@@ -67,11 +67,9 @@ const resetPasswordUser = async (req, res) => {
 
 // View one profile user
 const viewOneUserProfile = async (req, res) => {
-  const id = req.params.id;
-
-  const { email } = req.query;
+  const { username } = req.query;
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ username });
     if (user) {
       res.status(200).json(user);
     } else {
