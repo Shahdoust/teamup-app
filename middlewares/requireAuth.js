@@ -20,7 +20,7 @@ const requireAuth = async (req, res, next) => {
 
     req.user = await User.findOne({ _id: id }).select("_id");
     //res.status(200).json(req.user); //here i get id of the user who sends request
-    // console.log("user is ", req.user);
+    console.log("user is from middleware ", req.user);
     next();
   } catch (err) {
     console.log(err);
