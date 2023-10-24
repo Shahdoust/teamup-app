@@ -1,4 +1,5 @@
 const Event = require("../schemas/Event");
+const User = require("../schemas/User");
 const jwt = require("jsonwebtoken");
 
 // Create event for specific sport
@@ -119,10 +120,62 @@ const deleteEvent = async (req, res) => {
   }
 };
 
+// Add an event to the user's 'eventsInterested' array and add this user to eventsLiked array
+const addEventToInterested = async (req, res) => {
+  const eventId = req.query.id; //if user is currently on specific event page
+  const userId = req.user._id.toString();
+
+  console.log("query test ", eventId);
+
+  try {
+    const user = await User.findOne({ _id: userId });
+
+    const event = await Event.findById(eventId);
+    if (user && event) {
+      user.userInfo.eventsLiked.push(eventId); //push new liked event in user's array
+      event.usersInterested.push(userId); //push new user interested in event's array
+    }
+
+    await user.save();
+    await event.save();
+    res
+      .status(200)
+      .json({ message: "Event added to interested list (user added too)" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Add an event to the user's 'eventsInterested' array and add this user to eventsLiked array
+const addUserToAttendedEvent = async (req, res) => {
+  const eventId = req.query.id; //if user is currently on specific event page
+  const userId = req.user._id.toString();
+
+  try {
+    const user = await User.findOne({ _id: userId });
+
+    const event = await Event.findById(eventId);
+    if (user && event) {
+      user.userInfo.eventsAttended.push(eventId); //push event into user's array of attending events
+      event.usersAttending.push(userId); //push new user attending in event's array
+    }
+
+    await user.save();
+    await event.save();
+    res
+      .status(200)
+      .json({ message: "Event added to attending list (user added too)" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   createEvent,
   getAllEvents,
   viewOneEvent,
   deleteEvent,
   editEvent,
+  addEventToInterested,
+  addUserToAttendedEvent,
 };
