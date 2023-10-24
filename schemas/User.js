@@ -88,28 +88,36 @@ const userSchema = new Schema({
   },
 });
 
-userSchema.statics.signup = async function (email, password, username) {
-  const exists = await this.findOne({ email });
+userSchema.statics.signup = async function (userInfo) {
+  const exists = await this.findOne({ email: userInfo.email });
   if (exists) {
     throw Error("Email is already in use");
   }
 
-  if (!email || !password || !username) {
+  if (!userInfo.email || !userInfo.password || !userInfo.username) {
     throw Error("Fill out all the fields");
   }
-  if (!validator.isEmail(email)) {
+  if (!validator.isEmail(userInfo.email)) {
     throw Error("Email is not valid");
   }
-  if (!validator.isStrongPassword(password)) {
+  if (!validator.isStrongPassword(userInfo.password)) {
     throw Error(
       "Make sure to use at least 8 characters, one upper case letter, a number and a symbol"
     );
   }
 
   const salt = await bcrypt.genSalt();
-  const hash = await bcrypt.hash(password, salt);
-  const user = await this.create({ email, password: hash, username });
-
+  const hash = await bcrypt.hash(userInfo.password, salt);
+  const user = await this.create({
+    email: userInfo.email,
+    password: hash,
+    username: userInfo.username,
+    userInfo: {
+      description: userInfo.description,
+      userImage: userInfo.userImage,
+      languagesSpoken: userInfo.languagesSpoken,
+    },
+  });
   return user;
 };
 
