@@ -46,9 +46,15 @@ const eventSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "User",
       },
-      username: String,
-      userImage: String,
-      languagesSpoken: String,
+      username: {
+        type: String,
+      },
+      userImage: {
+        type: String,
+      },
+      languagesSpoken: {
+        type: String,
+      },
     },
   ],
   minimumRequiredAmountOfPpl: {
