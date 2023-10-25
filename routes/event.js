@@ -18,6 +18,7 @@ const {
 const app = express.Router();
 
 const checkAuth = require("../middlewares/checkAuth");
+
 app.route("/").post(checkAuth, createEvent).get(getAllEvents);
 
 app.route("/:eventId").get(viewOneEvent).delete(deleteEvent);
