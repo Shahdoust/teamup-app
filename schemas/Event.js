@@ -5,6 +5,9 @@ const validator = require("validator");
 const { Schema } = mongoose;
 
 const eventSchema = new Schema({
+  title: {
+    type: String,
+  },
   sportType: {
     type: [String], //enum with languages
     enum: [
@@ -39,8 +42,13 @@ const eventSchema = new Schema({
   ],
   usersAttending: [
     {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+      userRef: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+      username: String,
+      userImage: String,
+      languagesSpoken: String,
     },
   ],
   minimumRequiredAmountOfPpl: {
@@ -64,7 +72,16 @@ const eventSchema = new Schema({
       },
     },
     address: {
-      type: String,
+      city: {
+        type: String,
+      },
+      street: {
+        type: String,
+      },
+      houseNumber: {
+        type: Number,
+      },
+      // type: String,
     },
   },
   hashTags: {
