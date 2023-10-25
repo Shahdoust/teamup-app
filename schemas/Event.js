@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
 
+
 const { Schema } = mongoose;
 
 const eventSchema = new Schema({
@@ -67,12 +68,12 @@ const eventSchema = new Schema({
   },
   location: {
     LatLng: {
-      latitude: {
+      lat: {
         type: Number,
         // required: [true, "Please add latitude"],
       },
 
-      longitude: {
+      lon: {
         type: Number,
         // required: [true, "Please add longitude"],
       },
@@ -112,5 +113,6 @@ const eventSchema = new Schema({
     required: true,
   },
 });
+
 
 module.exports = mongoose.model("Event", eventSchema);
