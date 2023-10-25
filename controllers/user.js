@@ -1,6 +1,7 @@
 const User = require("../schemas/User");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
+const { userLocation } = require("../utils/location");
 
 const createToken = (_id, name) => {
   return jwt.sign({ _id, name }, process.env.SECRET, { expiresIn: "1d" });
@@ -38,25 +39,6 @@ const editUserInfo = async (req, res) => {
   }
 };
 
-const userLocation = async (city, country) => {
-  try {
-    const locationQuery = `${city}${country}`;
-    const apiResponse = await axios.get(
-      `http://dev.virtualearth.net/REST/v1/Locations?q=${encodeURIComponent(
-        locationQuery
-      )}&key=${process.env.API_KEY}`
-    );
-    const coordinates = apiResponse.data.resourceSets[0].resources[0].point;
-    return {
-      latitude: coordinates.coordinates[0],
-      longitude: coordinates.coordinates[1],
-    };
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-// const updateUserCoordinates = async (req, res) => {
 const createUserCoordinates = async (req, res) => {
   const userId = req.params.id;
   const { city, country } = req.body;
