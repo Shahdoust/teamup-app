@@ -1,6 +1,10 @@
 const Event = require("../schemas/Event");
 const User = require("../schemas/User");
+
 const axios = require("axios");
+
+const { fetchLocationEvent } = require("../utils/location");
+
 
 // Create event for specific sport
 const createEvent = async (req, res) => {
@@ -175,13 +179,7 @@ const addUserToAttendedEvent = async (req, res) => {
         },
         { new: true }
       );
-      console.log(eventUpdate);
-      // user.userInfo.eventsAttended.push(eventId); //push event into user's array of attending events
-      // event.usersAttending.push(userId); //push new user attending in event's array
     }
-
-    // await user.save();
-    // await event.save();
     res
       .status(200)
       .json({ message: "Event added to attending list (user added too)" });
@@ -189,6 +187,7 @@ const addUserToAttendedEvent = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 const locationRetrieve = async (req, res) => {
   //to search event in city
@@ -221,6 +220,32 @@ const locationRetrieve = async (req, res) => {
   }
   //   await events.save();
 };
+// Get location event
+const eventLocation = async (req, res) => {
+  try {
+    const { houseNumber, street, city } = req.body;
+    const location = await fetchLocationEvent(houseNumber, street, city);
+    const event = await Event.findOneAndUpdate(
+      { _id: req.params.eventId },
+      {
+        "location.LatLng.lat": location.lat,
+        "location.LatLng.lon": location.lon,
+        "location.address.city": city,
+        "location.address.street": street,
+        "location.address.houseNumber": houseNumber,
+      },
+      { new: true }
+    );
+    if (!event) {
+      res.status(404).json({ msg: "The lat and lon location not updated" });
+    } else {
+      res.status(200).json(event);
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+
+};
 
 module.exports = {
   createEvent,
@@ -231,4 +256,5 @@ module.exports = {
   addEventToInterested,
   addUserToAttendedEvent,
   locationRetrieve,
+  eventLocation,
 };

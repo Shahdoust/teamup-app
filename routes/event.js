@@ -1,4 +1,5 @@
 const express = require("express");
+const fetchLocation = require("../utils/location");
 
 const userPermissionToEdit = require("../middlewares/editEventPermission");
 const requireAuth = require("../middlewares/requireAuth");
@@ -11,15 +12,17 @@ const {
   editEvent,
   addEventToInterested,
   addUserToAttendedEvent,
-  locationRetrieve,
+  eventLocation,
 } = require("../controllers/event");
 
 const app = express.Router();
 
 const checkAuth = require("../middlewares/checkAuth");
-app.get("/location", locationRetrieve);
+
 app.route("/").post(checkAuth, createEvent).get(getAllEvents);
+
 app.route("/:eventId").get(viewOneEvent).delete(deleteEvent);
+app.post("/:eventId/location", eventLocation);
 
 app.put("/like", requireAuth, addEventToInterested); //checks if user is authorized and only then can update interestedEvent's array
 //query example for above: http://localhost:8080/event/like?id=653679d494ad33f92f3ba768

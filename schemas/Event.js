@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
 
+
 const { Schema } = mongoose;
 
 const eventSchema = new Schema({
@@ -46,9 +47,15 @@ const eventSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "User",
       },
-      username: String,
-      userImage: String,
-      languagesSpoken: String,
+      username: {
+        type: String,
+      },
+      userImage: {
+        type: String,
+      },
+      languagesSpoken: {
+        type: String,
+      },
     },
   ],
   minimumRequiredAmountOfPpl: {
@@ -61,12 +68,12 @@ const eventSchema = new Schema({
   },
   location: {
     LatLng: {
-      latitude: {
+      lat: {
         type: Number,
         // required: [true, "Please add latitude"],
       },
 
-      longitude: {
+      lon: {
         type: Number,
         // required: [true, "Please add longitude"],
       },
@@ -106,5 +113,6 @@ const eventSchema = new Schema({
     required: true,
   },
 });
+
 
 module.exports = mongoose.model("Event", eventSchema);

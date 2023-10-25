@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
+const fetchLocationUser = require("../utils/location");
 
 const { Schema } = mongoose;
 
@@ -216,6 +217,10 @@ userSchema.statics.resetPassword = async function (
   );
 
   return user;
+};
+
+userSchema.methods.setLocation = async function () {
+  this.location = await fetchLocationUser(this.location.address.city);
 };
 
 userSchema.methods.getUserEvents = function () {};
