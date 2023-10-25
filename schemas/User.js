@@ -30,13 +30,21 @@ const userSchema = new Schema({
       LatLng: {
         latitude: {
           type: Number,
-          // required: [true, "Please add latitude"],
+          required: [true, "Please add latitude"],
+          default: 51.22441483,
         },
 
         longitude: {
           type: Number,
-          // required: [true, "Please add longitude"],
+          required: [true, "Please add longitude"],
+          default: 6.91159582,
         },
+      },
+      city: {
+        type: String,
+      },
+      country: {
+        type: String,
       },
     },
     registrationDate: {

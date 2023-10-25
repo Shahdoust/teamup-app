@@ -1,5 +1,6 @@
 const Event = require("../schemas/Event");
 const User = require("../schemas/User");
+const axios = require("axios");
 
 // Create event for specific sport
 const createEvent = async (req, res) => {
@@ -189,6 +190,38 @@ const addUserToAttendedEvent = async (req, res) => {
   }
 };
 
+const locationRetrieve = async (req, res) => {
+  //to search event in city
+  const { query } = req.query;
+  const url = `http://dev.virtualearth.net/REST/v1/Locations?q=${encodeURIComponent(
+    query
+  )}&key=${process.env.API_KEY}`;
+  axios
+    .get(url)
+    .then((responce) => {
+      const data = responce.data;
+      console.log(data.resourceSets[0].resources[0].name); //city name
+      console.log(data.resourceSets[0].resources[0].point.coordinates[0]); //lat?
+      console.log(data.resourceSets[0].resources[0].point.coordinates[1]); //long?
+
+      res.status(200).json(data);
+    })
+    .catch((err) => console.log(err));
+
+  try {
+    // const events = await Event.find({ "location.address.city": query });
+
+    const events = await Event.find({
+      "location.address.city": { $regex: new RegExp(query, "i") },
+    });
+
+    console.log("eeeeevents?????", events);
+  } catch (err) {
+    console.log(err.message);
+  }
+  //   await events.save();
+};
+
 module.exports = {
   createEvent,
   getAllEvents,
@@ -197,4 +230,5 @@ module.exports = {
   editEvent,
   addEventToInterested,
   addUserToAttendedEvent,
+  locationRetrieve,
 };
