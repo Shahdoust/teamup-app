@@ -21,7 +21,6 @@ const checkAuth = require("../middlewares/checkAuth");
 app.route("/").post(checkAuth, createEvent).get(getAllEvents);
 
 app.route("/:eventId").get(viewOneEvent).delete(deleteEvent);
-app.post("/:eventId/location", eventLocation);
 
 app.put("/like", requireAuth, addEventToInterested); //checks if user is authorized and only then can update interestedEvent's array
 //query example for above: http://localhost:8080/event/like?id=653679d494ad33f92f3ba768
