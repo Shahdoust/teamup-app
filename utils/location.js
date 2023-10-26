@@ -1,4 +1,5 @@
 const axios = require("axios");
+const Event = require("../schemas/Event");
 
 // Get latitude and longitude of city
 const fetchLocationUser = async (city) => {
@@ -50,4 +51,8 @@ const userLocation = async (city, country) => {
   }
 };
 
-module.exports = { fetchLocationUser, fetchLocationEvent, userLocation };
+module.exports = {
+  fetchLocationUser,
+  fetchLocationEvent,
+  userLocation,
+};
