@@ -10,34 +10,29 @@ const { fetchLocationEvent } = require("../utils/location");
 const createEvent = async (req, res) => {
   try {
     const userId = req.user._id.toString();
-    const {
-      sportType,
-      usersInterested,
-      usersAttending,
-      eventPicture,
-      minimumRequiredAmountOfPpl,
-      maxCapacity,
-      location,
-      hashTags,
-      eventDescription,
-      eventDateAndTime,
-      organizator,
-      eventStatus,
-    } = req.body;
+    const eventInfo = req.body;
+
+    const locationDetails = await fetchLocationEvent(eventInfo.location);
+    if (!locationDetails) {
+      res.status(200).json({ msg: "Location not found" });
+    }
+
+    // Update the lat and lon on schema location
+    eventInfo.location.LatLng = locationDetails;
 
     const event = await Event.create({
-      sportType,
-      usersInterested,
-      usersAttending,
-      eventPicture,
-      minimumRequiredAmountOfPpl,
-      maxCapacity,
-      location,
-      hashTags,
-      eventDescription,
-      eventDateAndTime,
+      sportType: eventInfo.sportType,
+      usersInterested: eventInfo.usersInterested,
+      usersAttending: eventInfo.usersAttending,
+      eventPicture: eventInfo.eventPicture,
+      minimumRequiredAmountOfPpl: eventInfo.minimumRequiredAmountOfPpl,
+      maxCapacity: eventInfo.maxCapacity,
+      location: eventInfo.location,
+      hashTags: eventInfo.hashTags,
+      eventDescription: eventInfo.eventDescription,
+      eventDateAndTime: eventInfo.eventDateAndTime,
       organizator: userId,
-      eventStatus,
+      eventStatus: eventInfo.eventStatus,
     });
 
     if (event) {
@@ -85,7 +80,21 @@ const viewOneEvent = async (req, res) => {
 const editEvent = async (req, res) => {
   const updatedEventInformation = req.body;
   const eventId = req.params.id;
-  //   console.log("hello from controller", eventId);
+
+  const checkAddress = await Event.findOne({ _id: eventId });
+  const location_new = checkAddress.location.address;
+  const location_old = updatedEventInformation.location.address;
+
+  // Compare the address
+  if (JSON.stringify(location_new) !== JSON.stringify(location_old)) {
+    const locationDetails = await fetchLocationEvent(
+      updatedEventInformation.location
+    );
+
+    // Update the lat and lon on schema location
+    updatedEventInformation.location.LatLng = locationDetails;
+  }
+
   try {
     const updatedEvent = await Event.findByIdAndUpdate(
       eventId,
@@ -95,6 +104,7 @@ const editEvent = async (req, res) => {
     if (!updatedEvent) {
       return res.status(404).json({ error: "event not found" });
     }
+
     await updatedEvent.save();
     res.json(updatedEvent);
   } catch (err) {
@@ -188,65 +198,6 @@ const addUserToAttendedEvent = async (req, res) => {
   }
 };
 
-
-const locationRetrieve = async (req, res) => {
-  //to search event in city
-  const { query } = req.query;
-  const url = `http://dev.virtualearth.net/REST/v1/Locations?q=${encodeURIComponent(
-    query
-  )}&key=${process.env.API_KEY}`;
-  axios
-    .get(url)
-    .then((responce) => {
-      const data = responce.data;
-      console.log(data.resourceSets[0].resources[0].name); //city name
-      console.log(data.resourceSets[0].resources[0].point.coordinates[0]); //lat?
-      console.log(data.resourceSets[0].resources[0].point.coordinates[1]); //long?
-
-      res.status(200).json(data);
-    })
-    .catch((err) => console.log(err));
-
-  try {
-    // const events = await Event.find({ "location.address.city": query });
-
-    const events = await Event.find({
-      "location.address.city": { $regex: new RegExp(query, "i") },
-    });
-
-    console.log("eeeeevents?????", events);
-  } catch (err) {
-    console.log(err.message);
-  }
-  //   await events.save();
-};
-// Get location event
-const eventLocation = async (req, res) => {
-  try {
-    const { houseNumber, street, city } = req.body;
-    const location = await fetchLocationEvent(houseNumber, street, city);
-    const event = await Event.findOneAndUpdate(
-      { _id: req.params.eventId },
-      {
-        "location.LatLng.lat": location.lat,
-        "location.LatLng.lon": location.lon,
-        "location.address.city": city,
-        "location.address.street": street,
-        "location.address.houseNumber": houseNumber,
-      },
-      { new: true }
-    );
-    if (!event) {
-      res.status(404).json({ msg: "The lat and lon location not updated" });
-    } else {
-      res.status(200).json(event);
-    }
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-
-};
-
 module.exports = {
   createEvent,
   getAllEvents,
@@ -255,6 +206,4 @@ module.exports = {
   editEvent,
   addEventToInterested,
   addUserToAttendedEvent,
-  locationRetrieve,
-  eventLocation,
 };

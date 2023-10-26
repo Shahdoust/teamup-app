@@ -15,16 +15,19 @@ const fetchLocationUser = async (city) => {
 };
 
 // Get latitude and longitude of city
-const fetchLocationEvent = async (number, street, city) => {
+const fetchLocationEvent = async (location) => {
+  const { LatLng, address } = location;
   try {
-    const address = `${street} ${number}, ${city}`;
     const response = await axios.get(
-      `https://nominatim.openstreetmap.org/search?street=${street} ${number}, ${city}&format=json`
+      `https://nominatim.openstreetmap.org/search?street=${address.houseNumber} ${address.street}, &city=${address.city}&format=json`
     );
 
     const data = response.data[0];
+
     return { lat: data.lat, lon: data.lon };
-  } catch (error) {}
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 // getting user location (just another API)
