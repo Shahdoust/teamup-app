@@ -90,10 +90,11 @@ const eventSchema = new Schema({
       // type: String,
     },
   },
-  hashTags: {
-    type: [String],
-    default: ["#sport_buddies", "#sport", "#meetUp"], //sorry for that
-  },
+  hashTags: [
+    {
+      name: String,
+    },
+  ],
   eventDescription: {
     type: String,
     required: true,
