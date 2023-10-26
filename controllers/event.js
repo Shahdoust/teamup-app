@@ -5,7 +5,6 @@ const axios = require("axios");
 
 const { fetchLocationEvent } = require("../utils/location");
 
-
 // Create event for specific sport
 const createEvent = async (req, res) => {
   try {
@@ -198,6 +197,22 @@ const addUserToAttendedEvent = async (req, res) => {
   }
 };
 
+// Get event by city in query
+const getEventsInArea = async (req, res) => {
+  try {
+    const { city } = req.query;
+    const events = await Event.find({
+      "location.address.city": city,
+    }).populate("organizator");
+
+    if (events) {
+      res.status(200).send(events);
+    }
+  } catch (err) {
+    res.status(400).json({ err: err.message });
+  }
+};
+
 module.exports = {
   createEvent,
   getAllEvents,
@@ -206,4 +221,5 @@ module.exports = {
   editEvent,
   addEventToInterested,
   addUserToAttendedEvent,
+  getEventsInArea,
 };

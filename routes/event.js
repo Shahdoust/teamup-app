@@ -12,14 +12,16 @@ const {
   editEvent,
   addEventToInterested,
   addUserToAttendedEvent,
-  eventLocation,
+  getEventsInArea,
 } = require("../controllers/event");
 
 const app = express.Router();
 
 const checkAuth = require("../middlewares/checkAuth");
-
 app.route("/").post(checkAuth, createEvent).get(getAllEvents);
+
+app.get("/findEvent", getEventsInArea); //find event by city in query
+//query example http://localhost:8080/event/findEvent?city=Kyiv
 
 app.route("/:eventId").get(viewOneEvent).delete(deleteEvent);
 
