@@ -15,6 +15,10 @@ const createEvent = async (req, res) => {
       res.status(200).json({ msg: "Location not found" });
     }
 
+    // find username with id from req
+    // const userInfo = await User.findById({ _id: userId });
+
+    console.log(userId);
     // Update the lat and lon on schema location
     eventInfo.location.LatLng = locationDetails;
 
@@ -35,9 +39,10 @@ const createEvent = async (req, res) => {
     });
 
     //bonding user with newly created event
-    const populatedEvent = await Event.findById(event._id).populate(
-      "organizator"
-    );
+    const populatedEvent = await Event.findById(event._id).populate({
+      path: "organizator",
+      select: "username userInfo.userImage",
+    });
 
     if (event) {
       const user = await User.findByIdAndUpdate(req.user._id, {
