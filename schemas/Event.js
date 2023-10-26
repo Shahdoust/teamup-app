@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
 
-
 const { Schema } = mongoose;
 
 const eventSchema = new Schema({
@@ -100,8 +99,21 @@ const eventSchema = new Schema({
     required: true,
   },
   eventDateAndTime: {
-    type: Date,
-    required: true,
+    eventDate: {
+      type: Date,
+      required: true,
+    },
+    eventTime: {
+      type: String,
+      required: true,
+      validate: {
+        validator: function (value) {
+          // checks if the time is in "HH:MM" format
+          return /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
+        },
+        message: 'Event time should be in "HH:MM" format',
+      },
+    },
   },
   organizator: {
     type: Schema.Types.ObjectId,
@@ -113,6 +125,5 @@ const eventSchema = new Schema({
     required: true,
   },
 });
-
 
 module.exports = mongoose.model("Event", eventSchema);
