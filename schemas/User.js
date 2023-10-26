@@ -114,6 +114,9 @@ userSchema.statics.signup = async function (userInfo) {
       "Make sure to use at least 8 characters, one upper case letter, a number and a symbol"
     );
   }
+  if (!validator.isAlphanumeric(userInfo.username)) {
+    throw Error("Username must contain only characters and/or numbers");
+  }
 
   const salt = await bcrypt.genSalt();
   const hash = await bcrypt.hash(userInfo.password, salt);
