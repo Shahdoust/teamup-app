@@ -10,10 +10,19 @@ const createToken = (_id, name) => {
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
+    const userImg = await User.findOne({ email });
+
     const user = await User.login(email, password);
 
     //creating token
-    const token = createToken(user._id, user.username);
+    let token;
+    if (userImg.userInfo.userImage) {
+      console.log(userImg.userInfo.userImage);
+      token = createToken(user._id, user.username, userImg.userInfo.userImage);
+    } else {
+      token = createToken(user._id, user.username);
+    }
+
     // const token = createToken(user._id);
 
     res.status(200).json({ email, token });
