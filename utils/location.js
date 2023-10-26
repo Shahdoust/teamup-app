@@ -32,7 +32,6 @@ const fetchLocationEvent = async (location) => {
 
 // getting user location (just another API)
 
-
 const userLocation = async (city, country) => {
   try {
     const locationQuery = `${city}${country}`;

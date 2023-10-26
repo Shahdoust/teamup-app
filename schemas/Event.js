@@ -2,11 +2,10 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
 
-
 const { Schema } = mongoose;
 
 const eventSchema = new Schema({
-  title: {
+  eventTitle: {
     type: String,
   },
   sportType: {
@@ -113,6 +112,5 @@ const eventSchema = new Schema({
     required: true,
   },
 });
-
 
 module.exports = mongoose.model("Event", eventSchema);

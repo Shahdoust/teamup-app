@@ -5,7 +5,6 @@ const axios = require("axios");
 
 const { fetchLocationEvent } = require("../utils/location");
 
-
 // Create event for specific sport
 const createEvent = async (req, res) => {
   try {
@@ -21,6 +20,7 @@ const createEvent = async (req, res) => {
     eventInfo.location.LatLng = locationDetails;
 
     const event = await Event.create({
+      eventTitle: eventInfo.eventTitle,
       sportType: eventInfo.sportType,
       usersInterested: eventInfo.usersInterested,
       usersAttending: eventInfo.usersAttending,
