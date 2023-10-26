@@ -10,7 +10,6 @@ const createEvent = async (req, res) => {
   try {
     const userId = req.user._id.toString();
     const eventInfo = req.body;
-
     const locationDetails = await fetchLocationEvent(eventInfo.location);
     if (!locationDetails) {
       res.status(200).json({ msg: "Location not found" });
@@ -34,14 +33,20 @@ const createEvent = async (req, res) => {
       eventStatus: eventInfo.eventStatus,
     });
 
+    //bonding user with newly created event
+    const populatedEvent = await Event.findById(event._id).populate(
+      "organizator"
+    );
+
     if (event) {
       const user = await User.findByIdAndUpdate(req.user._id, {
         $push: { "userInfo.eventsOrganized": event._id },
       });
-      res.status(201).json(event);
+      res.status(201).json(populatedEvent);
     }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    // res.status(500).json({ error: error.message });
+    console.log(error, "from controller");
   }
 };
 
