@@ -1,5 +1,7 @@
 const User = require("../schemas/User");
 const jwt = require("jsonwebtoken");
+const axios = require("axios");
+const { userLocation } = require("../utils/location");
 
 const createToken = (_id, name) => {
   return jwt.sign({ _id, name }, process.env.SECRET, { expiresIn: "1d" });
@@ -32,6 +34,35 @@ const editUserInfo = async (req, res) => {
     );
     await updatedUser.save();
     res.json(updatedUser);
+  } catch (err) {
+    res.status(500).json({ err: err.message });
+  }
+};
+
+const createUserCoordinates = async (req, res) => {
+  const userId = req.params.id;
+  const { city, country } = req.body;
+  console.log("from edit", city, country);
+  try {
+    const coordinates = await userLocation(city, country);
+    console.log("coords from edit", coordinates);
+    const user = await User.findByIdAndUpdate(
+      { _id: userId },
+      {
+        "userInfo.location.city": city,
+        "userInfo.location.country": country,
+        "userInfo.location.LatLng.latitude": coordinates.latitude,
+        "userInfo.location.LatLng.longitude": coordinates.longitude,
+      },
+      { new: true }
+    );
+
+    await user.save();
+    if (!user) {
+      res.status(404).json({ msg: "user not found" });
+    } else {
+      res.status(200).json(user);
+    }
   } catch (err) {
     res.status(500).json({ err: err.message });
   }
@@ -97,4 +128,5 @@ module.exports = {
   resetPasswordUser,
   viewOneUserProfile,
   viewAllUserProfile,
+  createUserCoordinates,
 };

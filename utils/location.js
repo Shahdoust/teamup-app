@@ -30,4 +30,25 @@ const fetchLocationEvent = async (location) => {
   }
 };
 
-module.exports = { fetchLocationUser, fetchLocationEvent };
+// getting user location (just another API)
+
+
+const userLocation = async (city, country) => {
+  try {
+    const locationQuery = `${city}${country}`;
+    const apiResponse = await axios.get(
+      `http://dev.virtualearth.net/REST/v1/Locations?q=${encodeURIComponent(
+        locationQuery
+      )}&key=${process.env.API_KEY}`
+    );
+    const coordinates = apiResponse.data.resourceSets[0].resources[0].point;
+    return {
+      latitude: coordinates.coordinates[0],
+      longitude: coordinates.coordinates[1],
+    };
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+module.exports = { fetchLocationUser, fetchLocationEvent, userLocation };
