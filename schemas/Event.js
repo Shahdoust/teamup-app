@@ -92,7 +92,9 @@ const eventSchema = new Schema({
   },
   hashTags: [
     {
-      name: String,
+      name: {
+        type: String,
+      },
     },
   ],
   eventDescription: {
