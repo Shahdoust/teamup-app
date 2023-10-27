@@ -59,7 +59,10 @@ const createEvent = async (req, res) => {
 // Get all events creator
 const getAllEvents = async (req, res) => {
   try {
-    const events = await Event.find();
+    const events = await Event.find().populate("organizator", [
+      "username",
+      "userInfo.userImage",
+    ]);
 
     console.log(events.length);
     if (!events) {
