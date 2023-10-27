@@ -23,7 +23,7 @@ app.route("/").post(checkAuth, createEvent).get(getAllEvents);
 app.get("/findEvent", getEventsInArea); //find event by city in query
 //query example http://localhost:8080/event/findEvent?city=Kyiv
 
-app.route("/:eventId").get(viewOneEvent).delete(deleteEvent);
+app.route("/:eventId").get(viewOneEvent).delete(checkAuth, deleteEvent);
 
 app.put("/like", requireAuth, addEventToInterested); //checks if user is authorized and only then can update interestedEvent's array
 //query example for above: http://localhost:8080/event/like?id=653679d494ad33f92f3ba768
