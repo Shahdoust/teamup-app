@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
 const fetchLocationUser = require("../utils/location");
-
+const { userLocation } = require("../utils/location");
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
@@ -98,6 +98,8 @@ const userSchema = new Schema({
 });
 
 userSchema.statics.signup = async function (userInfo) {
+  console.log("user info from schema ", userInfo);
+
   const exists = await this.findOne({ email: userInfo.email });
   if (exists) {
     throw Error("Email is already in use");
@@ -118,19 +120,48 @@ userSchema.statics.signup = async function (userInfo) {
     throw Error("Username must contain only characters and/or numbers");
   }
 
-  const salt = await bcrypt.genSalt();
-  const hash = await bcrypt.hash(userInfo.password, salt);
-  const user = await this.create({
-    email: userInfo.email,
-    password: hash,
-    username: userInfo.username,
-    userInfo: {
-      description: userInfo.description,
-      userImage: userInfo.userImage,
-      languagesSpoken: userInfo.languagesSpoken,
-    },
-  });
-  return user;
+  if (userInfo.userInfo?.location) {
+    //will add Lat and Long to user if he choose location
+    const latLag = await userLocation(
+      userInfo.userInfo.location.city,
+      userInfo.userInfo.location.country
+    );
+    const salt = await bcrypt.genSalt();
+    const hash = await bcrypt.hash(userInfo.password, salt);
+    const user = await this.create({
+      email: userInfo.email,
+      password: hash,
+      username: userInfo.username,
+      userInfo: {
+        description: userInfo.description,
+        userImage: userInfo.userImage,
+        languagesSpoken: userInfo.languagesSpoken,
+        location: {
+          LatLng: {
+            latitude: latLag.latitude,
+            longitude: latLag.longitude,
+          },
+          city: userInfo.userInfo.location.city,
+          country: userInfo.userInfo.location.country,
+        },
+      },
+    });
+    return user;
+  } else {
+    const salt = await bcrypt.genSalt();
+    const hash = await bcrypt.hash(userInfo.password, salt);
+    const user = await this.create({
+      email: userInfo.email,
+      password: hash,
+      username: userInfo.username,
+      userInfo: {
+        description: userInfo.description,
+        userImage: userInfo.userImage,
+        languagesSpoken: userInfo.languagesSpoken,
+      },
+    });
+    return user;
+  }
 };
 
 // static custom login method

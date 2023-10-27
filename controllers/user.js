@@ -139,6 +139,7 @@ const userSignUp = async (req, res) => {
       token = createToken(user._id, user.username);
     }
     console.log(token);
+
     res.status(200).json({ email: userInfo.email, token });
   } catch (error) {
     res.status(400).json({ error: error.message });
