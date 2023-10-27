@@ -75,7 +75,10 @@ const getAllEvents = async (req, res) => {
 const viewOneEvent = async (req, res) => {
   try {
     const eventId = req.params.eventId;
-    const events = await Event.findOne({ _id: eventId });
+    const events = await Event.findOne({ _id: eventId }).populate(
+      "organizator",
+      ["username", "userInfo.userImage"]
+    );
     if (!events) {
       return res.status(404).json({ msg: "Event not found" });
     }
@@ -114,6 +117,10 @@ const editEvent = async (req, res) => {
     if (!updatedEvent) {
       return res.status(404).json({ error: "event not found" });
     }
+    //make event completed
+    // if (updatedEvent.eventDateAndTime.eventDate < Date.now()) {
+    //   updatedEvent.status = "completed";
+    // }
 
     await updatedEvent.save();
     res.json(updatedEvent);

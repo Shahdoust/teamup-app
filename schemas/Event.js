@@ -124,6 +124,7 @@ const eventSchema = new Schema({
     type: String,
     enum: ["upcoming", "completed"],
     required: true,
+    default: "upcoming",
   },
 });
 
