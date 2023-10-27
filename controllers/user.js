@@ -36,6 +36,11 @@ const editUserInfo = async (req, res) => {
   const updatedUserInformation = req.body;
   const userId = req.params;
 
+  console.log("edit user", req.params);
+
+  const userLoc = await User.findById({ _id: userId });
+  console.log("users from edit ", userLoc);
+
   try {
     const updatedUser = await User.updateUserInfo(
       userId,
