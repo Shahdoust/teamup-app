@@ -31,14 +31,14 @@ const userSchema = new Schema({
       LatLng: {
         latitude: {
           type: Number,
-          required: [true, "Please add latitude"],
-          default: 51.22441483,
+          // required: [true, "Please add latitude"],
+          // default: 51.22441483,
         },
 
         longitude: {
           type: Number,
-          required: [true, "Please add longitude"],
-          default: 6.91159582,
+          // required: [true, "Please add longitude"],
+          // default: 6.91159582,
         },
       },
       city: {
@@ -164,18 +164,38 @@ userSchema.statics.updateUserInfo = async function (userId, updatedInfo) {
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     throw Error("Invalid user id");
   }
-
+  console.log("info that updates in schema", updatedInfo);
   try {
     const updatedUser = await this.findByIdAndUpdate(
-      { _id: userId.id },
-      { $set: { userInfo: updatedInfo } },
+      { _id: userId },
+      {
+        $set: {
+          username: updatedInfo.username,
+          // email: updatedInfo.email,
+          "userInfo.userImage": updatedInfo.userInfo.userImage,
+          "userInfo.description": updatedInfo.userInfo.description,
+          "userInfo.location.country": updatedInfo.userInfo.location.country,
+          "userInfo.location.city": updatedInfo.userInfo.location.city,
+          "userInfo.location.latitude": updatedInfo.userInfo.location.latitude,
+          "userInfo.location.longitude":
+            updatedInfo.userInfo.location.longitude,
+        },
+        $push: {
+          "userInfo.languagesSpoken": updatedInfo.userInfo.languagesSpoken,
+          "userInfo.interestedInSports":
+            updatedInfo.userInfo.interestedInSports,
+        },
+      },
+
       { new: true }
     );
 
+    updatedUser.save();
+    console.log("from schema", updatedUser);
+    console.log("from schema info to update", updatedInfo);
     if (!updatedUser) {
       throw Error("user is not found");
     }
-    // await updatedUser.save();
     return updatedUser;
   } catch (err) {
     throw Error("Failed to update user info");
