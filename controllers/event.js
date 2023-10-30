@@ -210,6 +210,7 @@ const addUserToAttendedEvent = async (req, res) => {
         },
         { new: true }
       );
+      // await eventUpdate.save();
     }
 
     res

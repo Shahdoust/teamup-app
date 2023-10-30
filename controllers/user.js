@@ -36,61 +36,60 @@ const editUserInfo = async (req, res) => {
   const updatedInfo = req.body;
   const userId = req.params;
 
-  console.log("user info to update AGAIN", updatedInfo);
-  if (updatedInfo.userInfo.location) {
+  if (updatedInfo.userInfo) {
     const checkAddress = await User.findOne({ _id: userId.id });
+    // console.log("checkAddress", checkAddress);
     const country_new = updatedInfo.userInfo.location?.country;
     const city_new = updatedInfo.userInfo.location?.city;
-    const city_old = checkAddress.userInfo.location.city;
-    const country_old = checkAddress.userInfo.location.country;
+    const city_old = checkAddress.userInfo?.location?.city;
+    const country_old = checkAddress.userInfo?.location?.country;
     // Compare the country and city
     if (country_new !== country_old || city_new !== city_old) {
-      const locationDetails = await userLocation(city_new, country_new);
+      let locationDetails = await userLocation(city_new, country_new);
 
       // Update the lat and lon on user location
-      updatedInfo.userInfo.location.LatLng = locationDetails;
-
-      console.log(
-        "location details?????????",
-        updatedInfo.userInfo.location.LatLng
-      );
+      locationDetails = updatedInfo.userInfo.location?.LatLng;
 
       const updatedUser = await User.findByIdAndUpdate(
         { _id: userId.id },
         {
           $set: {
-            "userInfo.location.country": updatedInfo.userInfo.location.country,
-            "userInfo.location.city": updatedInfo.userInfo.location.city,
-            "userInfo.location.LatLng.latitude": locationDetails.latitude,
-            "userInfo.location.LatLng.longitude": locationDetails.longitude,
+            "userInfo.location.country": updatedInfo.userInfo.location?.country,
+            "userInfo.location.city": updatedInfo.userInfo.location?.city,
+            "userInfo.location.LatLng.latitude": locationDetails?.latitude,
+            "userInfo.location.LatLng.longitude": locationDetails?.longitude,
+            "userInfo.userImage": updatedInfo.userInfo.userImage,
+            "userInfo.description": updatedInfo.userInfo.description,
+          },
+          $push: {
+            "userInfo.languagesSpoken": updatedInfo.userInfo.languagesSpoken,
+            "userInfo.interestedInSports":
+              updatedInfo.userInfo.interestedInSports,
           },
         },
         { new: true }
       );
       await updatedUser.save();
+      if (!updatedInfo.username) {
+        res.status(200).json(updatedUser);
+      }
     }
   }
 
   try {
-    const updatedUser = await User.findByIdAndUpdate(
-      { _id: userId.id },
-      {
-        $set: {
-          username: updatedInfo.username,
-          "userInfo.userImage": updatedInfo.userInfo.userImage,
-          "userInfo.description": updatedInfo.userInfo.description,
+    if (updatedInfo.username) {
+      const updatedUser = await User.findByIdAndUpdate(
+        { _id: userId.id },
+        {
+          $set: {
+            username: updatedInfo.username,
+          },
         },
-        $push: {
-          "userInfo.languagesSpoken": updatedInfo.userInfo.languagesSpoken,
-          "userInfo.interestedInSports":
-            updatedInfo.userInfo.interestedInSports,
-        },
-      },
-      { new: true }
-    );
-
-    await updatedUser.save();
-    res.status(200).json(updatedUser);
+        { new: true }
+      );
+      await updatedUser.save();
+      res.status(200).json(updatedUser);
+    }
   } catch (err) {
     res.status(500).json({ err: err.message });
   }
@@ -139,6 +138,7 @@ const userSignUp = async (req, res) => {
       token = createToken(user._id, user.username);
     }
     console.log(token);
+
     res.status(200).json({ email: userInfo.email, token });
   } catch (error) {
     res.status(400).json({ error: error.message });
