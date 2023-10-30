@@ -195,7 +195,6 @@ const addUserToAttendedEvent = async (req, res) => {
 
     const event = await Event.findById(eventId);
 
-    console.log(user._id, user.username);
     if (user && event) {
       const eventUpdate = await Event.findByIdAndUpdate(
         { _id: eventId },
@@ -204,8 +203,8 @@ const addUserToAttendedEvent = async (req, res) => {
             usersAttending: {
               userRef: user,
               username: user.username,
-              userImage: user.userInfo?.userImage,
-              languagesSpoken: user.userInfo?.languagesSpoken,
+              userImage: user.userInfo.userImage,
+              // languagesSpoken: user.userInfo.languagesSpoken,
             },
           },
         },
@@ -213,6 +212,7 @@ const addUserToAttendedEvent = async (req, res) => {
       );
       // await eventUpdate.save();
     }
+
     res
       .status(200)
       .json({ message: "Event added to attending list (user added too)" });
