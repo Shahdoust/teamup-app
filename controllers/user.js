@@ -35,28 +35,29 @@ const loginUser = async (req, res) => {
 const editUserInfo = async (req, res) => {
   const updatedInfo = req.body;
   const userId = req.params;
+
   if (updatedInfo.userInfo) {
     const checkAddress = await User.findOne({ _id: userId.id });
-    console.log("checkAddress", checkAddress);
+    // console.log("checkAddress", checkAddress);
     const country_new = updatedInfo.userInfo.location?.country;
     const city_new = updatedInfo.userInfo.location?.city;
     const city_old = checkAddress.userInfo?.location?.city;
     const country_old = checkAddress.userInfo?.location?.country;
     // Compare the country and city
     if (country_new !== country_old || city_new !== city_old) {
-      const locationDetails = await userLocation(city_new, country_new);
+      let locationDetails = await userLocation(city_new, country_new);
 
       // Update the lat and lon on user location
-      updatedInfo.userInfo.location.LatLng = locationDetails;
+      locationDetails = updatedInfo.userInfo.location?.LatLng;
 
       const updatedUser = await User.findByIdAndUpdate(
         { _id: userId.id },
         {
           $set: {
-            "userInfo.location.country": updatedInfo.userInfo.location.country,
-            "userInfo.location.city": updatedInfo.userInfo.location.city,
-            "userInfo.location.LatLng.latitude": locationDetails.latitude,
-            "userInfo.location.LatLng.longitude": locationDetails.longitude,
+            "userInfo.location.country": updatedInfo.userInfo.location?.country,
+            "userInfo.location.city": updatedInfo.userInfo.location?.city,
+            "userInfo.location.LatLng.latitude": locationDetails?.latitude,
+            "userInfo.location.LatLng.longitude": locationDetails?.longitude,
             "userInfo.userImage": updatedInfo.userInfo.userImage,
             "userInfo.description": updatedInfo.userInfo.description,
           },
@@ -76,18 +77,19 @@ const editUserInfo = async (req, res) => {
   }
 
   try {
-    const updatedUser = await User.findByIdAndUpdate(
-      { _id: userId.id },
-      {
-        $set: {
-          username: updatedInfo.username,
+    if (updatedInfo.username) {
+      const updatedUser = await User.findByIdAndUpdate(
+        { _id: userId.id },
+        {
+          $set: {
+            username: updatedInfo.username,
+          },
         },
-      },
-      { new: true }
-    );
-
-    await updatedUser.save();
-    res.status(200).json(updatedUser);
+        { new: true }
+      );
+      await updatedUser.save();
+      res.status(200).json(updatedUser);
+    }
   } catch (err) {
     res.status(500).json({ err: err.message });
   }
