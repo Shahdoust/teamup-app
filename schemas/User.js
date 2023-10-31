@@ -52,7 +52,15 @@ const userSchema = new Schema({
       type: Date,
       default: Date.now, // Automatically set registration date
     },
-    userRating: {
+    userRating: [
+      {
+        raterId: { type: Schema.Types.ObjectId, ref: "User" },
+        rating: Number,
+        comment: String,
+      },
+    ],
+    userRater: [{ type: String }],
+    averageRating: {
       type: Number,
     },
     interestedInSports: [
