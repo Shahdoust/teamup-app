@@ -106,8 +106,6 @@ const userSchema = new Schema({
 });
 
 userSchema.statics.signup = async function (userInfo) {
-  console.log("user info from schema ", userInfo);
-
   const exists = await this.findOne({ email: userInfo.email });
   if (exists) {
     throw Error("Email is already in use");
@@ -128,13 +126,6 @@ userSchema.statics.signup = async function (userInfo) {
     throw Error("Username must contain only characters and/or numbers");
   }
 
-  // if (userInfo.userInfo?.location) {
-  //   //will add Lat and Long to user if he choose location
-  //   const latLag = await userLocation(
-  //     userInfo.userInfo.location.city,
-  //     userInfo.userInfo.location.country
-  //   );
-  // console.log("from schema??", latLag);
   const salt = await bcrypt.genSalt();
   const hash = await bcrypt.hash(userInfo.password, salt);
   const user = await this.create({
@@ -145,14 +136,10 @@ userSchema.statics.signup = async function (userInfo) {
       description: userInfo.description,
       userImage: userInfo.userImage,
       languagesSpoken: userInfo.languagesSpoken,
-      // location: {
-      //   LatLng: {
-      //     latitude: latLag.latitude,
-      //     longitude: latLag.longitude,
-      //   },
-      //   city: userInfo.userInfo.location.city,
-      //   country: userInfo.userInfo.location.country,
-      // },
+      location: {
+        city: userInfo.location.city,
+        country: userInfo.location.country,
+      },
     },
   });
   return user;
