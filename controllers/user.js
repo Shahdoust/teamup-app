@@ -2,6 +2,7 @@ const User = require("../schemas/User");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const { userLocation } = require("../utils/location");
+const { calculateAverageRating } = require("../utils/userRating");
 
 const createToken = (_id, name, image) => {
   return jwt.sign({ _id, name, image }, process.env.SECRET, {
@@ -185,6 +186,35 @@ const viewAllUserProfile = async (req, res) => {
   }
 };
 
+// Submit a user rating
+const submitUserRating = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const raterId = req.user._id;
+
+    const rateDetails = req.body;
+
+    const user = await User.findByIdAndUpdate(userId, {
+      $push: {
+        "userInfo.userRater": raterId,
+        "userInfo.userRating": rateDetails.userRating,
+      },
+    });
+
+    const findUser = await User.findOne({ "userInfo.userRater": raterId });
+    // ToDo: change the status for user, that can update
+    if (!findUser) {
+      calculateAverageRating(userId);
+      res.status(200).json({ msg: "Rating submitted successfully" });
+    } else {
+      res.status(200).json({ msg: "Your rate is already submitted" });
+    }
+  } catch (error) {
+    console.error("Error submitting user rating: ", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   loginUser,
   editUserInfo,
@@ -193,4 +223,5 @@ module.exports = {
   viewOneUserProfile,
   viewAllUserProfile,
   createUserCoordinates,
+  submitUserRating,
 };
