@@ -4,7 +4,7 @@ const User = require("../schemas/User");
 const { scheduleEventStatusUpdates } = require("../utils/backgroundTasks");
 const { fetchLocationEvent } = require("../utils/location");
 
-scheduleEventStatusUpdates();
+// scheduleEventStatusUpdates();
 
 // Create event for specific sport
 const createEvent = async (req, res) => {
@@ -195,6 +195,26 @@ const addUserToAttendedEvent = async (req, res) => {
 
     const event = await Event.findById(eventId);
 
+    // Check if user already attending
+    const findUserAttending = await User.findOne({
+      "userInfo.eventsAttended": eventId,
+    });
+
+    if (findUserAttending) {
+      return res
+        .status(201)
+        .json({ msg: "You are already attending the event" });
+    }
+    const userUpdate = await User.findByIdAndUpdate(
+      { _id: userId },
+      {
+        $push: {
+          "userInfo.eventsAttended": eventId,
+        },
+      },
+      { new: true }
+    );
+
     if (user && event) {
       const eventUpdate = await Event.findByIdAndUpdate(
         { _id: eventId },
@@ -206,25 +226,6 @@ const addUserToAttendedEvent = async (req, res) => {
               userImage: user.userInfo.userImage,
               // languagesSpoken: user.userInfo.languagesSpoken,
             },
-          },
-        },
-        { new: true }
-      );
-
-      // Check if user already attending
-      const findUserAttending = await User.findOne({
-        "userInfo.eventsAttended": userId,
-      });
-      if (findUserAttending) {
-        return res
-          .status(201)
-          .json({ msg: "You are already attending the event" });
-      }
-      const userUpdate = await User.findByIdAndUpdate(
-        { _id: userId },
-        {
-          $push: {
-            "userInfo.eventsAttended": user,
           },
         }
       );
