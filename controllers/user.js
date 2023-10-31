@@ -32,18 +32,17 @@ const loginUser = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
 //edit or fill up full user info
 const editUserInfo = async (req, res) => {
   const updatedInfo = req.body;
   const userId = req.params;
-
   if (updatedInfo.userInfo) {
     const checkAddress = await User.findOne({ _id: userId.id });
-    // console.log("checkAddress", checkAddress);
     const country_new = updatedInfo.userInfo.location?.country;
     const city_new = updatedInfo.userInfo.location?.city;
-    const city_old = checkAddress.userInfo?.location?.city;
-    const country_old = checkAddress.userInfo?.location?.country;
+    const city_old = checkAddress.userInfo.location?.city;
+    const country_old = checkAddress.userInfo.location?.country;
     // Compare the country and city
     if (country_new !== country_old || city_new !== city_old) {
       let locationDetails = await userLocation(city_new, country_new);
@@ -128,17 +127,23 @@ const createUserCoordinates = async (req, res) => {
 // Signup user
 const userSignUp = async (req, res) => {
   const userInfo = req.body;
+
+  console.log("signup user", userInfo);
   try {
     const user = await User.signup(userInfo);
     //creating token
     let token;
     if (user.userInfo.userImage) {
-      console.log(user.userInfo.userImage);
+      // console.log(user.userInfo.userImage);
       token = createToken(user._id, user.username, user.userInfo.userImage);
     } else {
       token = createToken(user._id, user.username);
     }
-    console.log(token);
+
+    // if (user.userInfo.location) {
+    //   createUserCoordinates();
+    // }
+    // console.log(token);
 
     res.status(200).json({ email: userInfo.email, token });
   } catch (error) {

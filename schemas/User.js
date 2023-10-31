@@ -134,6 +134,7 @@ userSchema.statics.signup = async function (userInfo) {
       userInfo.userInfo.location.city,
       userInfo.userInfo.location.country
     );
+    // console.log("from schema??", latLag);
     const salt = await bcrypt.genSalt();
     const hash = await bcrypt.hash(userInfo.password, salt);
     const user = await this.create({
