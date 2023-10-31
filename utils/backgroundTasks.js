@@ -5,6 +5,7 @@ const cron = require("node-cron");
 const updateEventStatuses = async (event) => {
   const currentTimestamp = new Date();
   const eventTime = event.eventDateAndTime.eventTime;
+
   const hours = currentTimestamp.getUTCHours();
   const minutes = currentTimestamp.getUTCMinutes();
 
