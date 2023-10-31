@@ -210,7 +210,24 @@ const addUserToAttendedEvent = async (req, res) => {
         },
         { new: true }
       );
-      // await eventUpdate.save();
+
+      // Check if user already attending
+      const findUserAttending = await User.findOne({
+        "userInfo.eventsAttended": userId,
+      });
+      if (findUserAttending) {
+        return res
+          .status(201)
+          .json({ msg: "You are already attending the event" });
+      }
+      const userUpdate = await User.findByIdAndUpdate(
+        { _id: userId },
+        {
+          $push: {
+            "userInfo.eventsAttended": user,
+          },
+        }
+      );
     }
 
     res
