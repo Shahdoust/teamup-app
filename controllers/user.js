@@ -199,21 +199,21 @@ const submitUserRating = async (req, res) => {
 
     const rateDetails = req.body;
 
+    const findUser = await User.findOne({ "userInfo.userRater": raterId });
+    // ToDo: change the status for user, that can update
+    if (!findUser) {
+      calculateAverageRating(userId);
+      res.status(200).json({ msg: "Rating submitted successfully" });
+    } else {
+      return res.status(200).json({ msg: "Your rate is already submitted" });
+    }
+
     const user = await User.findByIdAndUpdate(userId, {
       $push: {
         "userInfo.userRater": raterId,
         "userInfo.userRating": rateDetails.userRating,
       },
     });
-
-    const findUser = await User.findOne({ "userInfo.userRater": raterId });
-    // ToDo: change the status for user, that can update
-    if (!findUser) {
-      res.status(200).json({ msg: "Rating submitted successfully" });
-    } else {
-      return res.status(200).json({ msg: "Your rate is already submitted" });
-    }
-    calculateAverageRating(userId);
   } catch (error) {
     console.error("Error submitting user rating: ", error);
     res.status(500).json({ error: error.message });
