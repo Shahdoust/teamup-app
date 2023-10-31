@@ -33,68 +33,6 @@ const loginUser = async (req, res) => {
   }
 };
 
-//edit or fill up full user info
-// const editUserInfo = async (req, res) => {
-//   const updatedInfo = req.body;
-//   const userId = req.params;
-//   if (updatedInfo.userInfo) {
-//     const checkAddress = await User.findOne({ _id: userId.id });
-//     const country_new = updatedInfo.userInfo.location?.country;
-//     const city_new = updatedInfo.userInfo.location?.city;
-//     const city_old = checkAddress.userInfo.location?.city;
-//     const country_old = checkAddress.userInfo.location?.country;
-//     // Compare the country and city
-//     if (country_new !== country_old || city_new !== city_old) {
-//       let locationDetails = await userLocation(city_new, country_new);
-
-//       // Update the lat and lon on user location
-//       locationDetails = updatedInfo.userInfo.location?.LatLng;
-
-//       const updatedUser = await User.findByIdAndUpdate(
-//         { _id: userId.id },
-//         {
-//           $set: {
-//             "userInfo.location.country": updatedInfo.userInfo.location?.country,
-//             "userInfo.location.city": updatedInfo.userInfo.location?.city,
-//             "userInfo.location.LatLng.latitude": locationDetails?.latitude,
-//             "userInfo.location.LatLng.longitude": locationDetails?.longitude,
-//             "userInfo.userImage": updatedInfo.userInfo.userImage,
-//             "userInfo.description": updatedInfo.userInfo.description,
-//           },
-//           $push: {
-//             "userInfo.languagesSpoken": updatedInfo.userInfo.languagesSpoken,
-//             "userInfo.interestedInSports":
-//               updatedInfo.userInfo.interestedInSports,
-//           },
-//         },
-//         { new: true }
-//       );
-//       await updatedUser.save();
-//       if (!updatedInfo.username) {
-//         res.status(200).json(updatedUser);
-//       }
-//     }
-//   }
-
-//   try {
-//     if (updatedInfo.username) {
-//       const updatedUser = await User.findByIdAndUpdate(
-//         { _id: userId.id },
-//         {
-//           $set: {
-//             username: updatedInfo.username,
-//           },
-//         },
-//         { new: true }
-//       );
-//       await updatedUser.save();
-//       res.status(200).json(updatedUser);
-//     }
-//   } catch (err) {
-//     res.status(500).json({ err: err.message });
-//   }
-// };
-
 // edit info
 const editUserInfo = async (req, res) => {
   const updatedInfo = req.body;
@@ -252,7 +190,6 @@ const submitUserRating = async (req, res) => {
   }
 };
 
-<<<<<<< Updated upstream
 // upload image
 const uploadImage = async (req, res) => {
   const userId = req.params;
@@ -275,17 +212,16 @@ const uploadImage = async (req, res) => {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ err });
-=======
+  }
+};
 // Delete user
 const deleteUser = async (req, res) => {
   const userId = req.user._id;
-  console.log(userId);
   try {
     const userDeleted = await User.deleteOne({ _id: userId });
     res.status(200).json({ msg: "Your account successfully deleted" });
   } catch (error) {
     res.status(500).json({ msg: "The user was not successfully deleted" });
->>>>>>> Stashed changes
   }
 };
 
@@ -298,9 +234,6 @@ module.exports = {
   viewAllUserProfile,
   createUserCoordinates,
   submitUserRating,
-<<<<<<< Updated upstream
   uploadImage,
-=======
   deleteUser,
->>>>>>> Stashed changes
 };

@@ -9,11 +9,8 @@ const {
   viewAllUserProfile,
   createUserCoordinates,
   submitUserRating,
-<<<<<<< Updated upstream
   uploadImage,
-=======
   deleteUser,
->>>>>>> Stashed changes
 } = require("../controllers/user");
 const checkToken = require("../middlewares/checkAuth");
 const upload = require("../service/upload");
