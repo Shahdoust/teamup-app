@@ -128,49 +128,49 @@ userSchema.statics.signup = async function (userInfo) {
     throw Error("Username must contain only characters and/or numbers");
   }
 
-  if (userInfo.userInfo?.location) {
-    //will add Lat and Long to user if he choose location
-    const latLag = await userLocation(
-      userInfo.userInfo.location.city,
-      userInfo.userInfo.location.country
-    );
-    // console.log("from schema??", latLag);
-    const salt = await bcrypt.genSalt();
-    const hash = await bcrypt.hash(userInfo.password, salt);
-    const user = await this.create({
-      email: userInfo.email,
-      password: hash,
-      username: userInfo.username,
-      userInfo: {
-        description: userInfo.description,
-        userImage: userInfo.userImage,
-        languagesSpoken: userInfo.languagesSpoken,
-        location: {
-          LatLng: {
-            latitude: latLag.latitude,
-            longitude: latLag.longitude,
-          },
-          city: userInfo.userInfo.location.city,
-          country: userInfo.userInfo.location.country,
-        },
-      },
-    });
-    return user;
-  } else {
-    const salt = await bcrypt.genSalt();
-    const hash = await bcrypt.hash(userInfo.password, salt);
-    const user = await this.create({
-      email: userInfo.email,
-      password: hash,
-      username: userInfo.username,
-      userInfo: {
-        description: userInfo.description,
-        userImage: userInfo.userImage,
-        languagesSpoken: userInfo.languagesSpoken,
-      },
-    });
-    return user;
-  }
+  // if (userInfo.userInfo?.location) {
+  //   //will add Lat and Long to user if he choose location
+  //   const latLag = await userLocation(
+  //     userInfo.userInfo.location.city,
+  //     userInfo.userInfo.location.country
+  //   );
+  // console.log("from schema??", latLag);
+  const salt = await bcrypt.genSalt();
+  const hash = await bcrypt.hash(userInfo.password, salt);
+  const user = await this.create({
+    email: userInfo.email,
+    password: hash,
+    username: userInfo.username,
+    userInfo: {
+      description: userInfo.description,
+      userImage: userInfo.userImage,
+      languagesSpoken: userInfo.languagesSpoken,
+      // location: {
+      //   LatLng: {
+      //     latitude: latLag.latitude,
+      //     longitude: latLag.longitude,
+      //   },
+      //   city: userInfo.userInfo.location.city,
+      //   country: userInfo.userInfo.location.country,
+      // },
+    },
+  });
+  return user;
+  // } else {
+  // const salt = await bcrypt.genSalt();
+  // const hash = await bcrypt.hash(userInfo.password, salt);
+  // const user = await this.create({
+  //   email: userInfo.email,
+  //   password: hash,
+  //   username: userInfo.username,
+  // userInfo: {
+  //   description: userInfo.description,
+  //   userImage: userInfo.userImage,
+  //   languagesSpoken: userInfo.languagesSpoken,
+  // },
+  // });
+  // return user;
+  // }
 };
 
 // static custom login method

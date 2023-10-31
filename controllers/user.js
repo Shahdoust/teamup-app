@@ -34,30 +34,80 @@ const loginUser = async (req, res) => {
 };
 
 //edit or fill up full user info
+// const editUserInfo = async (req, res) => {
+//   const updatedInfo = req.body;
+//   const userId = req.params;
+//   if (updatedInfo.userInfo) {
+//     const checkAddress = await User.findOne({ _id: userId.id });
+//     const country_new = updatedInfo.userInfo.location?.country;
+//     const city_new = updatedInfo.userInfo.location?.city;
+//     const city_old = checkAddress.userInfo.location?.city;
+//     const country_old = checkAddress.userInfo.location?.country;
+//     // Compare the country and city
+//     if (country_new !== country_old || city_new !== city_old) {
+//       let locationDetails = await userLocation(city_new, country_new);
+
+//       // Update the lat and lon on user location
+//       locationDetails = updatedInfo.userInfo.location?.LatLng;
+
+//       const updatedUser = await User.findByIdAndUpdate(
+//         { _id: userId.id },
+//         {
+//           $set: {
+//             "userInfo.location.country": updatedInfo.userInfo.location?.country,
+//             "userInfo.location.city": updatedInfo.userInfo.location?.city,
+//             "userInfo.location.LatLng.latitude": locationDetails?.latitude,
+//             "userInfo.location.LatLng.longitude": locationDetails?.longitude,
+//             "userInfo.userImage": updatedInfo.userInfo.userImage,
+//             "userInfo.description": updatedInfo.userInfo.description,
+//           },
+//           $push: {
+//             "userInfo.languagesSpoken": updatedInfo.userInfo.languagesSpoken,
+//             "userInfo.interestedInSports":
+//               updatedInfo.userInfo.interestedInSports,
+//           },
+//         },
+//         { new: true }
+//       );
+//       await updatedUser.save();
+//       if (!updatedInfo.username) {
+//         res.status(200).json(updatedUser);
+//       }
+//     }
+//   }
+
+//   try {
+//     if (updatedInfo.username) {
+//       const updatedUser = await User.findByIdAndUpdate(
+//         { _id: userId.id },
+//         {
+//           $set: {
+//             username: updatedInfo.username,
+//           },
+//         },
+//         { new: true }
+//       );
+//       await updatedUser.save();
+//       res.status(200).json(updatedUser);
+//     }
+//   } catch (err) {
+//     res.status(500).json({ err: err.message });
+//   }
+// };
+
+// edit info
 const editUserInfo = async (req, res) => {
   const updatedInfo = req.body;
   const userId = req.params;
-  if (updatedInfo.userInfo) {
-    const checkAddress = await User.findOne({ _id: userId.id });
-    const country_new = updatedInfo.userInfo.location?.country;
-    const city_new = updatedInfo.userInfo.location?.city;
-    const city_old = checkAddress.userInfo.location?.city;
-    const country_old = checkAddress.userInfo.location?.country;
-    // Compare the country and city
-    if (country_new !== country_old || city_new !== city_old) {
-      let locationDetails = await userLocation(city_new, country_new);
-
-      // Update the lat and lon on user location
-      locationDetails = updatedInfo.userInfo.location?.LatLng;
-
+  try {
+    if (updatedInfo.userInfo) {
       const updatedUser = await User.findByIdAndUpdate(
         { _id: userId.id },
         {
           $set: {
+            username: updatedInfo.username,
             "userInfo.location.country": updatedInfo.userInfo.location?.country,
             "userInfo.location.city": updatedInfo.userInfo.location?.city,
-            "userInfo.location.LatLng.latitude": locationDetails?.latitude,
-            "userInfo.location.LatLng.longitude": locationDetails?.longitude,
             "userInfo.userImage": updatedInfo.userInfo.userImage,
             "userInfo.description": updatedInfo.userInfo.description,
           },
@@ -65,24 +115,6 @@ const editUserInfo = async (req, res) => {
             "userInfo.languagesSpoken": updatedInfo.userInfo.languagesSpoken,
             "userInfo.interestedInSports":
               updatedInfo.userInfo.interestedInSports,
-          },
-        },
-        { new: true }
-      );
-      await updatedUser.save();
-      if (!updatedInfo.username) {
-        res.status(200).json(updatedUser);
-      }
-    }
-  }
-
-  try {
-    if (updatedInfo.username) {
-      const updatedUser = await User.findByIdAndUpdate(
-        { _id: userId.id },
-        {
-          $set: {
-            username: updatedInfo.username,
           },
         },
         { new: true }
@@ -98,10 +130,10 @@ const editUserInfo = async (req, res) => {
 const createUserCoordinates = async (req, res) => {
   const userId = req.params.id;
   const { city, country } = req.body;
-  console.log("from edit", city, country);
+  // console.log("from edit", city, country);
   try {
     const coordinates = await userLocation(city, country);
-    console.log("coords from edit", coordinates);
+    // console.log("coords from edit", coordinates);
     const user = await User.findByIdAndUpdate(
       { _id: userId },
       {
@@ -220,6 +252,31 @@ const submitUserRating = async (req, res) => {
   }
 };
 
+// upload image
+const uploadImage = async (req, res) => {
+  const userId = req.params;
+  try {
+    if (req.file && req.file.path) {
+      const userImage = await User.findByIdAndUpdate(
+        { _id: userId },
+        {
+          $set: { "userInfo.userImage": req.file.path },
+        }
+      );
+
+      await userImage.save();
+      return res.status(200).json({ msg: "image successfully saved" });
+      // return res.status(200).json(userImage);
+    } else {
+      console.log(req.file);
+      res.status(422).json({ msg: "invalid file" });
+    }
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ err });
+  }
+};
+
 module.exports = {
   loginUser,
   editUserInfo,
@@ -229,4 +286,5 @@ module.exports = {
   viewAllUserProfile,
   createUserCoordinates,
   submitUserRating,
+  uploadImage,
 };
