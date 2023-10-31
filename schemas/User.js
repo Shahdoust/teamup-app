@@ -137,8 +137,8 @@ userSchema.statics.signup = async function (userInfo) {
       userImage: userInfo.userImage,
       languagesSpoken: userInfo.languagesSpoken,
       location: {
-        city: userInfo.location.city,
-        country: userInfo.location.country,
+        city: userInfo.location?.city,
+        country: userInfo.location?.country,
       },
     },
   });
