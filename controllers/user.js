@@ -252,6 +252,7 @@ const submitUserRating = async (req, res) => {
   }
 };
 
+<<<<<<< Updated upstream
 // upload image
 const uploadImage = async (req, res) => {
   const userId = req.params;
@@ -274,6 +275,17 @@ const uploadImage = async (req, res) => {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ err });
+=======
+// Delete user
+const deleteUser = async (req, res) => {
+  const userId = req.user._id;
+  console.log(userId);
+  try {
+    const userDeleted = await User.deleteOne({ _id: userId });
+    res.status(200).json({ msg: "Your account successfully deleted" });
+  } catch (error) {
+    res.status(500).json({ msg: "The user was not successfully deleted" });
+>>>>>>> Stashed changes
   }
 };
 
@@ -286,5 +298,9 @@ module.exports = {
   viewAllUserProfile,
   createUserCoordinates,
   submitUserRating,
+<<<<<<< Updated upstream
   uploadImage,
+=======
+  deleteUser,
+>>>>>>> Stashed changes
 };

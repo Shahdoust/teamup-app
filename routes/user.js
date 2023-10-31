@@ -9,7 +9,11 @@ const {
   viewAllUserProfile,
   createUserCoordinates,
   submitUserRating,
+<<<<<<< Updated upstream
   uploadImage,
+=======
+  deleteUser,
+>>>>>>> Stashed changes
 } = require("../controllers/user");
 const checkToken = require("../middlewares/checkAuth");
 const upload = require("../service/upload");
@@ -27,4 +31,5 @@ app.put("/edit/:id", upload.single("picture"), uploadImage); //upload image and 
 app.post("/edit/:id", createUserCoordinates);
 const checkAuth = require("../middlewares/checkAuth");
 app.post("/users/:userId/rater-user", checkAuth, submitUserRating);
+app.delete("/users/", checkAuth, deleteUser);
 module.exports = app;
