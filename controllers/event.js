@@ -11,15 +11,14 @@ const createEvent = async (req, res) => {
   try {
     const userId = req.user._id.toString();
     const eventInfo = req.body;
-    const locationDetails = await fetchLocationEvent(eventInfo.location);
-    if (!locationDetails) {
-      res.status(200).json({ msg: "Location not found" });
-    }
+    const locationDetails = eventInfo.location; // await fetchLocationEvent(eventInfo.location);
+    // if (!locationDetails) {
+    //   res.status(200).json({ msg: "Location not found" });
+    // }
 
     // find username with id from req
     // const userInfo = await User.findById({ _id: userId });
 
-    console.log(userId);
     // Update the lat and lon on schema location
     eventInfo.location.LatLng = locationDetails;
 
