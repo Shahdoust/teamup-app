@@ -67,12 +67,12 @@ const eventSchema = new Schema({
   },
   location: {
     LatLng: {
-      lat: {
+      latitude: {
         type: Number,
         // required: [true, "Please add latitude"],
       },
 
-      lon: {
+      longitude: {
         type: Number,
         // required: [true, "Please add longitude"],
       },
