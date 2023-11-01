@@ -166,14 +166,13 @@ const submitUserRating = async (req, res) => {
   try {
     const { userId } = req.params;
     const raterId = req.user._id;
-
     const rateDetails = req.body;
 
-    console.log("userId", userId);
     const findUser = await User.findOne({ _id: userId });
-    console.log("raterId._idddddddd", findUser);
+
     const userInfoRaterAry = findUser.userInfo.userRater;
-    const findRaters = () => {
+    console.log(userInfoRaterAry.length);
+    const findRaters = async () => {
       if (userInfoRaterAry.length > 0) {
         userInfoRaterAry.map(async (rater) => {
           if (raterId == rater) {
@@ -187,29 +186,23 @@ const submitUserRating = async (req, res) => {
                 "userInfo.userRating": rateDetails.userRating,
               },
             });
-
+            console.log("user from map", user);
             calculateAverageRating(userId);
-            res.status(200).json({ msg: "Rating submitted successfully" });
           }
         });
+      } else {
+        const user = await User.findByIdAndUpdate(userId, {
+          $push: {
+            "userInfo.userRater": raterId,
+            "userInfo.userRating": rateDetails.userRating,
+            "userInfo.averageRating": rateDetails.userRating[0].rating,
+          },
+        });
+        res.status(200).json({ msg: "Rating submitted successfully" });
+        console.log("user from else", user);
       }
     };
     findRaters();
-    // console.log(findUser);
-    // ToDo: change the status for user, that can update
-    // if (!findUser) {
-    //   calculateAverageRating(userId);
-    //   res.status(200).json({ msg: "Rating submitted successfully" });
-    // } else {
-    //   return res.status(200).json({ msg: "Your rate is already submitted" });
-    // }
-
-    // const user = await User.findByIdAndUpdate(userId, {
-    //   $push: {
-    //     "userInfo.userRater": raterId,
-    //     "userInfo.userRating": rateDetails.userRating,
-    //   },
-    // });
   } catch (error) {
     console.error("Error submitting user rating: ", error);
     res.status(500).json({ error: error.message });
