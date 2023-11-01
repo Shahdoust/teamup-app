@@ -4,7 +4,7 @@ const User = require("../schemas/User");
 const { scheduleEventStatusUpdates } = require("../utils/backgroundTasks");
 const { fetchLocationEvent } = require("../utils/location");
 
-// scheduleEventStatusUpdates();
+scheduleEventStatusUpdates();
 
 // Create event for specific sport
 const createEvent = async (req, res) => {

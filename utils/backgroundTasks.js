@@ -3,29 +3,31 @@ const cron = require("node-cron");
 
 // Update event status
 const updateEventStatuses = async (event) => {
-  const currentTimestamp = new Date();
-  const eventTime = event.eventDateAndTime.eventTime;
-
-  const hours = currentTimestamp.getUTCHours();
-  const minutes = currentTimestamp.getUTCMinutes();
-
-  const currentTimeString = `${hours}:${minutes}`;
-
-  let newStatus = "Upcoming";
-  if (currentTimeString >= eventTime) {
-    newStatus = "Completed";
-  }
-
   try {
-    const result = await Event.updateOne(
-      { _id: event._id },
-      { $set: { status: newStatus } }
-    );
+    // Get event time from database and convert to string
+    const eventTime = event.eventDateAndTime.eventTime;
+    const dateString = eventTime; // Sample date and time string
+    const dateObject = new Date(dateString);
+    const eventTime_hours = dateObject.getUTCHours();
+    const eventTime_minutes = dateObject.getUTCMinutes();
+    const eventTimeString = `${eventTime_hours}:${eventTime_minutes}`;
 
-    if (result.nModified === 1) {
-      console.log(`Event ${event._id} status updated to ${newStatus}`);
-    } else {
-      console.error(`Event ${event._id} status update not modified`);
+    // Set current time and convert to string
+    const currentTimestamp = new Date();
+    const current_hours = currentTimestamp.getUTCHours();
+    const current_minutes = currentTimestamp.getUTCMinutes();
+
+    const currentTimeString = `${current_hours}:${current_minutes}`;
+    let newStatus = "upcoming";
+    // Update status if event is passed
+    if (currentTimeString > eventTimeString) {
+      newStatus = "completed";
+
+      const result = await Event.findOneAndUpdate(
+        { _id: event._id },
+        { $set: { eventStatus: newStatus } },
+        { new: true }
+      );
     }
   } catch (error) {
     console.error("Error updating event status:", error);
@@ -54,7 +56,7 @@ const scheduleEventStatusUpdates = async () => {
         if (updateHours < 0) {
           updateHours = 23;
         }
-        const cronExpression = `${eventMinutes} ${updateHours} * * *`;
+        const cronExpression = `* * * * *`;
 
         cron.schedule(cronExpression, () => {
           updateEventStatuses(event);
