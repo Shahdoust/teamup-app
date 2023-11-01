@@ -134,7 +134,7 @@ userSchema.statics.signup = async function (userInfo) {
     username: userInfo.username,
     userInfo: {
       description: userInfo.description,
-      userImage: userInfo.userImage,
+      // userImage: userInfo.userImage,
       languagesSpoken: userInfo.languagesSpoken,
       location: {
         city: userInfo.location?.city,
