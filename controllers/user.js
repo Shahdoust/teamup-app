@@ -228,7 +228,7 @@ const submitUserRating = async (req, res) => {
 
 // upload image
 const uploadImage = async (req, res) => {
-  const userId = req.params;
+  const userId = req.params.id;
   try {
     if (req.file && req.file.path) {
       const userImage = await User.findByIdAndUpdate(
@@ -237,12 +237,9 @@ const uploadImage = async (req, res) => {
           $set: { "userInfo.userImage": req.file.path },
         }
       );
-
-      await userImage.save();
       return res.status(200).json({ msg: "image successfully saved" });
-      // return res.status(200).json(userImage);
     } else {
-      console.log(req.file);
+      // console.log(req.file);
       res.status(422).json({ msg: "invalid file" });
     }
   } catch (err) {
