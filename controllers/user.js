@@ -97,23 +97,32 @@ const createUserCoordinates = async (req, res) => {
 // Signup user
 const userSignUp = async (req, res) => {
   const userInfo = req.body;
+  const userImage = req.file;
 
-  console.log("signup user", userInfo);
   try {
-    const user = await User.signup(userInfo);
+    let user = await User.signup(userInfo);
+    if (userImage && user && req.file.path) {
+      user = await User.findOneAndUpdate(
+        { email: userInfo.email },
+        {
+          $set: { "userInfo.userImage": req.file.path },
+        }
+      );
+    }
+    await user.save();
+
+    const updatedUser = await User.findOne({ email: userInfo.email });
     //creating token
     let token;
-    if (user.userInfo.userImage) {
-      // console.log(user.userInfo.userImage);
-      token = createToken(user._id, user.username, user.userInfo.userImage);
+    if (updatedUser.userInfo.userImage) {
+      token = createToken(
+        updatedUser._id,
+        updatedUser.username,
+        updatedUser.userInfo.userImage
+      );
     } else {
       token = createToken(user._id, user.username);
     }
-
-    // if (user.userInfo.location) {
-    //   createUserCoordinates();
-    // }
-    // console.log(token);
 
     res.status(200).json({ email: userInfo.email, token });
   } catch (error) {
