@@ -169,21 +169,47 @@ const submitUserRating = async (req, res) => {
 
     const rateDetails = req.body;
 
-    const findUser = await User.findOne({ "userInfo.userRater": raterId });
-    // ToDo: change the status for user, that can update
-    if (!findUser) {
-      calculateAverageRating(userId);
-      res.status(200).json({ msg: "Rating submitted successfully" });
-    } else {
-      return res.status(200).json({ msg: "Your rate is already submitted" });
-    }
+    console.log("userId", userId);
+    const findUser = await User.findOne({ _id: userId });
+    console.log("raterId._idddddddd", findUser);
+    const userInfoRaterAry = findUser.userInfo.userRater;
+    const findRaters = () => {
+      if (userInfoRaterAry.length > 0) {
+        userInfoRaterAry.map(async (rater) => {
+          if (raterId == rater) {
+            return res
+              .status(200)
+              .json({ msg: "Your rate is already submitted" });
+          } else {
+            const user = await User.findByIdAndUpdate(userId, {
+              $push: {
+                "userInfo.userRater": raterId,
+                "userInfo.userRating": rateDetails.userRating,
+              },
+            });
 
-    const user = await User.findByIdAndUpdate(userId, {
-      $push: {
-        "userInfo.userRater": raterId,
-        "userInfo.userRating": rateDetails.userRating,
-      },
-    });
+            calculateAverageRating(userId);
+            res.status(200).json({ msg: "Rating submitted successfully" });
+          }
+        });
+      }
+    };
+    findRaters();
+    // console.log(findUser);
+    // ToDo: change the status for user, that can update
+    // if (!findUser) {
+    //   calculateAverageRating(userId);
+    //   res.status(200).json({ msg: "Rating submitted successfully" });
+    // } else {
+    //   return res.status(200).json({ msg: "Your rate is already submitted" });
+    // }
+
+    // const user = await User.findByIdAndUpdate(userId, {
+    //   $push: {
+    //     "userInfo.userRater": raterId,
+    //     "userInfo.userRating": rateDetails.userRating,
+    //   },
+    // });
   } catch (error) {
     console.error("Error submitting user rating: ", error);
     res.status(500).json({ error: error.message });
