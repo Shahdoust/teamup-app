@@ -171,36 +171,53 @@ const submitUserRating = async (req, res) => {
     const findUser = await User.findOne({ _id: userId });
 
     const userInfoRaterAry = findUser.userInfo.userRater;
-    console.log(userInfoRaterAry.length);
     const findRaters = async () => {
       if (userInfoRaterAry.length > 0) {
-        userInfoRaterAry.map(async (rater) => {
+        const match = userInfoRaterAry.find((rater) => {
           if (raterId == rater) {
             return res
               .status(200)
               .json({ msg: "Your rate is already submitted" });
-          } else {
-            const user = await User.findByIdAndUpdate(userId, {
-              $push: {
-                "userInfo.userRater": raterId,
-                "userInfo.userRating": rateDetails.userRating,
-              },
-            });
-            console.log("user from map", user);
-            calculateAverageRating(userId);
           }
         });
+        console.log("match", match);
+        if (!match) {
+          const user = await User.findByIdAndUpdate(userId, {
+            $push: {
+              "userInfo.userRater": raterId,
+              "userInfo.userRating": rateDetails.userRating,
+              // "userInfo.averageRating": rateDetails.userRating[0].rating,
+            },
+          });
+          res.status(200).json({ msg: "Rating submitted successfully" });
+
+          calculateAverageRating(userId);
+        }
       } else {
         const user = await User.findByIdAndUpdate(userId, {
           $push: {
             "userInfo.userRater": raterId,
             "userInfo.userRating": rateDetails.userRating,
-            "userInfo.averageRating": rateDetails.userRating[0].rating,
+            // "userInfo.averageRating": rateDetails.userRating[0].rating,
           },
         });
         res.status(200).json({ msg: "Rating submitted successfully" });
-        console.log("user from else", user);
+
+        calculateAverageRating(userId);
       }
+
+      //else {
+      // const user = await User.findByIdAndUpdate(userId, {
+      //   $push: {
+      //     "userInfo.userRater": raterId,
+      //     "userInfo.userRating": rateDetails.userRating,
+      //     "userInfo.averageRating": rateDetails.userRating[0].rating,
+      //   },
+      // });
+      // res.status(200).json({ msg: "Rating submitted successfully" });
+      // console.log("user from else", user);
+      // calculateAverageRating(userId);
+      // }
     };
     findRaters();
   } catch (error) {
