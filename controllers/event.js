@@ -254,6 +254,37 @@ const getEventsInArea = async (req, res) => {
   }
 };
 
+// Create comment
+const createComment = async (req, res) => {
+  const commentDetails = req.body;
+  const userId = req.user._id;
+  const { eventId } = req.params;
+
+  try {
+    const comment = await Event.findByIdAndUpdate(
+      { _id: eventId },
+      {
+        $push: {
+          eventComment: {
+            userId: userId,
+            content: commentDetails.eventComment[0].content,
+            timestamp: new Date(),
+          },
+        },
+      },
+      { new: true }
+    );
+
+    if (comment) {
+      res.status(200).json(comment);
+    } else {
+      res.status(401).json({ msg: "The comment was not created" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   createEvent,
   getAllEvents,
@@ -263,4 +294,5 @@ module.exports = {
   addEventToInterested,
   addUserToAttendedEvent,
   getEventsInArea,
+  createComment,
 };

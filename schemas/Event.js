@@ -129,8 +129,10 @@ const eventSchema = new Schema({
     default: "upcoming",
   },
   eventComment: {
-    eventId: { type: mongoose.Schema.Types.ObjectId, ref: "Event" },
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
     content: String,
     timestamp: { type: Date, default: Date.now },
   },
