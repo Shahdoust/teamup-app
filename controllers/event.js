@@ -162,23 +162,52 @@ const deleteEvent = async (req, res) => {
 const addEventToInterested = async (req, res) => {
   const eventId = req.query.id; //if user is currently on specific event page
   const userId = req.user._id.toString();
-
-  console.log("query test ", eventId);
-
   try {
     const user = await User.findOne({ _id: userId });
-
     const event = await Event.findById(eventId);
-    if (user && event) {
-      user.userInfo.eventsLiked.push(eventId); //push new liked event in user's array
-      event.usersInterested.push(userId); //push new user interested in event's array
-    }
 
-    await user.save();
-    await event.save();
-    res
-      .status(200)
-      .json({ message: "Event added to interested list (user added too)" });
+    const userInEvent = await Event.findOne({
+      usersInterested: userId,
+    });
+
+    const eventInUser = await User.findOne({
+      "userInfo.eventsLiked": eventId,
+    });
+
+    if (userInEvent && eventInUser) {
+      //userId needs to be in array of event and likewise
+      const removeEventFromUser = await User.findByIdAndUpdate(
+        { _id: userId },
+        {
+          $pull: { "userInfo.eventsLiked": eventId },
+        }
+      );
+
+      const removeUserFromEvent = await Event.findByIdAndUpdate(
+        { _id: eventId },
+        {
+          $pull: { usersInterested: userId },
+        }
+      );
+
+      await user.save();
+      await event.save();
+
+      res.status(200).json({ msg: "You are not liking this event anymore" });
+    } else {
+      if (user && event) {
+        user.userInfo.eventsLiked.push(eventId); //push new liked event in user's array
+        event.usersInterested.push(userId); //push new user interested in event's array
+
+        await user.save();
+        await event.save();
+        res
+          .status(200)
+          .json({ message: "Event added to interested list (user added too)" });
+      } else {
+        res.status(404).json({ msg: "Event or user not found" });
+      }
+    }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -187,34 +216,61 @@ const addEventToInterested = async (req, res) => {
 // Add an event to the user's 'eventsInterested' array and add this user to eventsLiked array
 const addUserToAttendedEvent = async (req, res) => {
   const eventId = req.query.id; //if user is currently on specific event page
-  const userId = req.user._id.toString();
+  const userId = req.user._id;
 
+  const stringUserId = userId.toString();
+  console.log("ids", eventId);
+  console.log("ids", userId);
   try {
-    const user = await User.findOne({ _id: userId });
+    const user = await User.findById({ _id: userId });
 
-    const event = await Event.findById(eventId);
+    const event = await Event.findOne({ _id: eventId });
 
     // Check if user already attending
     const findUserAttending = await User.findOne({
       "userInfo.eventsAttended": eventId,
     });
+    console.log("findUserAttending", findUserAttending);
 
-    if (findUserAttending) {
-      return res
-        .status(201)
-        .json({ msg: "You are already attending the event" });
-    }
-    const userUpdate = await User.findByIdAndUpdate(
-      { _id: userId },
-      {
-        $push: {
-          "userInfo.eventsAttended": eventId,
+    const findUserInEvent = await Event.findOne({
+      "usersAttending.userRef": stringUserId,
+    });
+    console.log("findUserInEvent", findUserInEvent);
+
+    if (findUserAttending && findUserInEvent) {
+      const removeEventFromUser = await User.findByIdAndUpdate(
+        { _id: userId },
+        {
+          $pull: { "userInfo.eventsAttended": eventId },
+        }
+      );
+
+      const removeUserFromEvent = await Event.findByIdAndUpdate(
+        { _id: eventId },
+        {
+          $pull: {
+            usersAttending: { userRef: stringUserId },
+          },
+        }
+      );
+      console.log("removeUserFromEvent", removeUserFromEvent);
+
+      await user.save();
+      await event.save();
+
+      return res.status(201).json({ msg: "You are not attending anymore" });
+    } else {
+      const userUpdate = await User.findByIdAndUpdate(
+        { _id: userId },
+        {
+          $push: {
+            "userInfo.eventsAttended": eventId,
+          },
         },
-      },
-      { new: true }
-    );
-
-    if (user && event) {
+        { new: true }
+      );
+      // console.log(userUpdate);
+      // if (user && event) {
       const eventUpdate = await Event.findByIdAndUpdate(
         { _id: eventId },
         {
@@ -228,11 +284,11 @@ const addUserToAttendedEvent = async (req, res) => {
           },
         }
       );
+      // }
+      res
+        .status(200)
+        .json({ message: "Event added to attending list (user added too)" });
     }
-
-    res
-      .status(200)
-      .json({ message: "Event added to attending list (user added too)" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
