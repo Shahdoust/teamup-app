@@ -86,18 +86,21 @@ const userSchema = new Schema({
         ref: "Event",
       },
     ],
-    languagesSpoken: {
-      type: [String], //enum with languages
-      enum: [
-        "English",
-        "Spanish",
-        "French",
-        "German",
-        "Chinese",
-        "Japanese",
-        "Other",
-      ],
-    },
+    languagesSpoken: [
+      {
+        type: [String], //enum with languages
+        enum: [
+          "English",
+          "Spanish",
+          "French",
+          "German",
+          "Chinese",
+          "Japanese",
+          "Other",
+        ],
+      },
+    ],
+
     customLanguage: {
       type: String,
     },
