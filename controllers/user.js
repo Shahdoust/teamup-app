@@ -62,13 +62,25 @@ const editUserInfo = async (req, res) => {
 
       if (duplicateSports.length > 0) {
         return res.status(200).json({ msg: "Sport is already added" });
+      } else {
+        const updatedUserSport = await User.findByIdAndUpdate(
+          { _id: userId.id },
+          {
+            $push: {
+              "userInfo.interestedInSports":
+                updatedInfo.userInfo.interestedInSports,
+            },
+          },
+          { new: true }
+        );
+        await updatedUserSport.save();
+        return res.status(200).json({ updatedUserSport });
       }
     } else {
       const updatedUser = await User.findByIdAndUpdate(
         { _id: userId.id },
         {
           $set: {
-            // username: updatedInfo.username,
             "userInfo.location.country": updatedInfo.userInfo.location?.country,
             "userInfo.location.city": updatedInfo.userInfo.location?.city,
             "userInfo.userImage": updatedInfo.userInfo.userImage,
