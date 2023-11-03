@@ -128,14 +128,23 @@ const eventSchema = new Schema({
     required: true,
     default: "upcoming",
   },
-  eventComment: {
-    userId: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+  eventComment: [
+    {
+      userId: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+      content: String,
+      timestamp: { type: Date, default: Date.now },
+      replies: [
+        {
+          userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+          content: String,
+          timestamp: { type: Date, default: Date.now },
+        },
+      ],
     },
-    content: String,
-    timestamp: { type: Date, default: Date.now },
-  },
+  ],
 });
 
 module.exports = mongoose.model("Event", eventSchema);
