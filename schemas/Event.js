@@ -8,23 +8,25 @@ const eventSchema = new Schema({
   eventTitle: {
     type: String,
   },
-  sportType: {
-    type: [String], //enum with languages
-    enum: [
-      "Football",
-      "Basketball",
-      "Swimming",
-      "Tennis",
-      "Volleyball",
-      "Handball",
-      "Cricket",
-      "Fitness",
-      "Yoga",
-      "Ski",
-      "Cycling",
-    ],
-    required: true,
-  },
+  sportType: [
+    {
+      type: [String], //enum with sports
+      enum: [
+        "Football",
+        "Basketball",
+        "Swimming",
+        "Tennis",
+        "Volleyball",
+        "Handball",
+        "Cricket",
+        "Fitness",
+        "Yoga",
+        "Ski",
+        "Cycling",
+      ],
+      required: true,
+    },
+  ],
   customSport: {
     type: String,
   },
