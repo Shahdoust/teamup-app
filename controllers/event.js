@@ -355,7 +355,12 @@ const replyComment = async (req, res) => {
       "eventComment._id": commentId,
     });
     if (_isCommentId) {
-      const rep = _isCommentId.eventComment[0].replies.push(replyDetails);
+      for (const comm of _isCommentId.eventComment) {
+        if (comm._id.toString() === commentId) {
+          const rep = comm.replies.push(replyDetails);
+        }
+      }
+
       // const replyComment = await Event.findByIdAndUpdate(
       //   { _id: eventId, "eventComment._id": commentId },
       //   {
