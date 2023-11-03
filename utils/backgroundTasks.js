@@ -4,23 +4,25 @@ const cron = require("node-cron");
 // Update event status
 const updateEventStatuses = async (event) => {
   try {
-    // Get event time from database and convert to string
-    const eventTime = event.eventDateAndTime.eventTime;
-    const dateString = eventTime; // Sample date and time string
-    const dateObject = new Date(dateString);
-    const eventTime_hours = dateObject.getUTCHours();
-    const eventTime_minutes = dateObject.getUTCMinutes();
-    const eventTimeString = `${eventTime_hours}:${eventTime_minutes}`;
-
+    const eventTimeString = convertDateTime(event.eventDateAndTime.eventTime);
     // Set current time and convert to string
     const currentTimestamp = new Date();
-    const current_hours = currentTimestamp.getUTCHours();
-    const current_minutes = currentTimestamp.getUTCMinutes();
+    const currentTimeString = convertDateTime(currentTimestamp);
 
-    const currentTimeString = `${current_hours}:${current_minutes}`;
+    // Check date
+    const eventDate = event.eventDateAndTime.eventDate;
+    const dayEvent = eventDate.getUTCDay();
+    const currentDay = currentTimestamp.getUTCDay();
+    const diffDay = dayEvent - currentDay;
+
+    // Check month
+    const eventMonth = eventDate.getMonth();
+    const currentMonth = currentTimestamp.getMonth();
+    const diffMonth = eventMonth - currentMonth;
+
     let newStatus = "upcoming";
     // Update status if event is passed
-    if (currentTimeString > eventTimeString) {
+    if (currentTimeString > eventTimeString && diffDay < 0 && diffMonth < 0) {
       newStatus = "completed";
 
       const result = await Event.findOneAndUpdate(
@@ -33,6 +35,17 @@ const updateEventStatuses = async (event) => {
     console.error("Error updating event status:", error);
   }
 };
+function convertDateTime(time, date, currentDateTime) {
+  // Get event time from database and convert to string
+  const eventTime = time;
+  const dateString = eventTime;
+  const dateObject = new Date(dateString);
+  const eventTime_hours = dateObject.getUTCHours();
+  const eventTime_minutes = dateObject.getUTCMinutes();
+  const eventTimeString = `${eventTime_hours}:${eventTime_minutes}`;
+
+  return eventTimeString;
+}
 
 // Schedule status for all events
 const scheduleEventStatusUpdates = async () => {
@@ -48,14 +61,6 @@ const scheduleEventStatusUpdates = async () => {
       const eventTime = event.eventDateAndTime.eventTime;
 
       if (eventTime) {
-        const [hours, minutes] = eventTime.split(":");
-        const eventHours = parseInt(hours, 10);
-        const eventMinutes = parseInt(minutes, 10);
-
-        let updateHours = eventHours - 1;
-        if (updateHours < 0) {
-          updateHours = 23;
-        }
         const cronExpression = `* * * * *`;
 
         cron.schedule(cronExpression, () => {
