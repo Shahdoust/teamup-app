@@ -11,11 +11,10 @@ const updateEventStatuses = async (event) => {
 
     // Check date
     const eventDate = event.eventDateAndTime.eventDate;
-    const dayEvent = eventDate.getUTCDay();
-    const currentDay = currentTimestamp.getUTCDay();
+    const dayEvent = eventDate.getDate();
+    const currentDay = currentTimestamp.getDate();
     const diffDay = dayEvent - currentDay;
 
-    console.log(diffDay, dayEvent, currentDay);
     // Check month
     const eventMonth = eventDate.getMonth();
     const currentMonth = currentTimestamp.getMonth();
