@@ -285,6 +285,43 @@ const createComment = async (req, res) => {
   }
 };
 
+// Reply to comment
+const replyComment = async (req, res) => {
+  const replyCommentDetails = req.body;
+  const userId = req.user._id;
+  const { eventId, commentId } = req.params;
+
+  // Details comment object
+  const replyDetails = {
+    userId: userId,
+    content: replyCommentDetails.replies[0].content,
+    timestamp: new Date(),
+  };
+
+  try {
+    const _isCommentId = await Event.findOne({
+      "eventComment._id": commentId,
+    });
+    if (_isCommentId) {
+      const replyComment = await Event.findByIdAndUpdate(
+        { _id: eventId, "eventComment._id": commentId },
+        {
+          $push: {
+            eventComment: {
+              replies: replyDetails,
+            },
+          },
+        },
+        { new: true }
+      );
+
+      res.status(200).json(replyComment);
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   createEvent,
   getAllEvents,
@@ -295,4 +332,5 @@ module.exports = {
   addUserToAttendedEvent,
   getEventsInArea,
   createComment,
+  replyComment,
 };
