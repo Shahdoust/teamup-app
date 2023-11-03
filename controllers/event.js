@@ -97,19 +97,19 @@ const editEvent = async (req, res) => {
   const updatedEventInformation = req.body;
   const eventId = req.params.id;
 
-  const checkAddress = await Event.findOne({ _id: eventId });
-  const location_new = checkAddress.location.address;
-  const location_old = updatedEventInformation.location.address;
+  // const checkAddress = await Event.findOne({ _id: eventId });
+  // const location_new = checkAddress.location.address;
+  // const location_old = updatedEventInformation.location.address;
 
-  // Compare the address
-  if (JSON.stringify(location_new) !== JSON.stringify(location_old)) {
-    const locationDetails = await fetchLocationEvent(
-      updatedEventInformation.location
-    );
+  // // Compare the address
+  // if (JSON.stringify(location_new) !== JSON.stringify(location_old)) {
+  //   const locationDetails = await fetchLocationEvent(
+  //     updatedEventInformation.location
+  //   );
 
-    // Update the lat and lon on schema location
-    updatedEventInformation.location.LatLng = locationDetails;
-  }
+  //   // Update the lat and lon on schema location
+  //   updatedEventInformation.location.LatLng = locationDetails;
+  // }
 
   try {
     const updatedEvent = await Event.findByIdAndUpdate(
@@ -120,13 +120,9 @@ const editEvent = async (req, res) => {
     if (!updatedEvent) {
       return res.status(404).json({ error: "event not found" });
     }
-    //make event completed
-    // if (updatedEvent.eventDateAndTime.eventDate < Date.now()) {
-    //   updatedEvent.status = "completed";
-    // }
 
     await updatedEvent.save();
-    res.json(updatedEvent);
+    res.status(200).json(updatedEvent);
   } catch (err) {
     res.status(500).json({ err: "failed to update event :(" });
   }
@@ -359,19 +355,20 @@ const replyComment = async (req, res) => {
       "eventComment._id": commentId,
     });
     if (_isCommentId) {
-      const replyComment = await Event.findByIdAndUpdate(
-        { _id: eventId, "eventComment._id": commentId },
-        {
-          $push: {
-            eventComment: {
-              replies: replyDetails,
-            },
-          },
-        },
-        { new: true }
-      );
-
-      res.status(200).json(replyComment);
+      const rep = _isCommentId.eventComment[0].replies.push(replyDetails);
+      // const replyComment = await Event.findByIdAndUpdate(
+      //   { _id: eventId, "eventComment._id": commentId },
+      //   {
+      //     $push: {
+      //       "eventComment.$.replies": replyDetails,
+      //     },
+      //   },
+      //   { new: true }
+      // );
+      _isCommentId.save();
+      res.status(200).json(_isCommentId);
+    } else {
+      res.status(400).json({ msg: "Reply to message not successfully" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
