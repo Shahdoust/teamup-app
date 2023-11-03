@@ -15,6 +15,7 @@ const updateEventStatuses = async (event) => {
     const currentDay = currentTimestamp.getUTCDay();
     const diffDay = dayEvent - currentDay;
 
+    console.log(diffDay, dayEvent, currentDay);
     // Check month
     const eventMonth = eventDate.getMonth();
     const currentMonth = currentTimestamp.getMonth();
@@ -22,7 +23,7 @@ const updateEventStatuses = async (event) => {
 
     let newStatus = "upcoming";
     // Update status if event is passed
-    if (currentTimeString > eventTimeString && diffDay < 0 && diffMonth < 0) {
+    if (diffDay < 0) {
       newStatus = "completed";
 
       const result = await Event.findOneAndUpdate(
