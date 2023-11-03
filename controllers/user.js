@@ -37,28 +37,43 @@ const loginUser = async (req, res) => {
 const editUserInfo = async (req, res) => {
   const updatedInfo = req.body;
   const userId = req.params;
+  console.log(updatedInfo.userInfo.interestedInSports);
   try {
-    if (updatedInfo.userInfo) {
-      const updatedUser = await User.findByIdAndUpdate(
-        { _id: userId.id },
-        {
-          $set: {
-            username: updatedInfo.username,
-            "userInfo.location.country": updatedInfo.userInfo.location?.country,
-            "userInfo.location.city": updatedInfo.userInfo.location?.city,
-            "userInfo.userImage": updatedInfo.userInfo.userImage,
-            "userInfo.description": updatedInfo.userInfo.description,
-          },
-          $push: {
-            "userInfo.languagesSpoken": updatedInfo.userInfo.languagesSpoken,
-            "userInfo.interestedInSports":
-              updatedInfo.userInfo.interestedInSports,
-          },
-        },
-        { new: true }
+    if (updatedInfo.userInfo.interestedInSports) {
+      const arrayChecks = await User.findById({ _id: userId.id });
+      const userSports = arrayChecks.userInfo.interestedInSports;
+      userSports.forEach((sport) => console.log(sport));
+
+      const duplicateSports = userSports.filter((sport) =>
+        updatedInfo.userInfo.interestedInSports?.includes(sport)
       );
-      await updatedUser.save();
-      res.status(200).json(updatedUser);
+
+      console.log("user after updating sport", duplicateSports);
+
+      if (duplicateSports.length > 0) {
+        return res.status(200).json({ msg: "Sport is already added" });
+      } else {
+        const updatedUser = await User.findByIdAndUpdate(
+          { _id: userId.id },
+          {
+            $set: {
+              username: updatedInfo.username,
+              "userInfo.location.country":
+                updatedInfo.userInfo.location?.country,
+              "userInfo.location.city": updatedInfo.userInfo.location?.city,
+              "userInfo.userImage": updatedInfo.userInfo.userImage,
+              "userInfo.description": updatedInfo.userInfo.description,
+            },
+            $push: {
+              "userInfo.interestedInSports":
+                updatedInfo.userInfo.interestedInSports,
+            },
+          },
+          { new: true }
+        );
+        await updatedUser.save();
+        res.status(200).json(updatedUser);
+      }
     }
   } catch (err) {
     res.status(500).json({ err: err.message });

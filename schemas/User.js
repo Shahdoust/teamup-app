@@ -65,7 +65,20 @@ const userSchema = new Schema({
     },
     interestedInSports: [
       {
-        type: String,
+        type: String, //enum with sports
+        enum: [
+          "Football",
+          "Basketball",
+          "Swimming",
+          "Tennis",
+          "Volleyball",
+          "Handball",
+          "Cricket",
+          "Fitness",
+          "Yoga",
+          "Ski",
+          "Cycling",
+        ],
       },
     ],
     eventsOrganized: [
@@ -100,7 +113,6 @@ const userSchema = new Schema({
         ],
       },
     ],
-
     customLanguage: {
       type: String,
     },
