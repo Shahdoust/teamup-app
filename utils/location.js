@@ -5,7 +5,7 @@ const Event = require("../schemas/Event");
 const fetchLocationUser = async (city) => {
   try {
     const response = await axios.get(
-      `https://nominatim.openstreetmap.org/search?city=${city}&format=json`
+      `https://nominatim.openstreetmap.org/search?q=`
     );
     const data = response.data[0];
     console.log(data.lat, data.lon);
@@ -19,13 +19,19 @@ const fetchLocationUser = async (city) => {
 const fetchLocationEvent = async (location) => {
   const { LatLng, address } = location;
   try {
+    // const response = await axios.get(
+    //   `https://nominatim.openstreetmap.org/search?street=${address.houseNumber} ${address.street}, &city=${address.city}&format=json`
+    // );
+
     const response = await axios.get(
-      `https://nominatim.openstreetmap.org/search?street=${address.houseNumber} ${address.street}, &city=${address.city}&format=json`
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${LatLng.latitude}&lon=${LatLng.longitude}`
     );
-
-    const data = response.data[0];
-
-    return { lat: data.lat, lon: data.lon };
+    const data = response.data;
+    const city = data.address.city;
+    return {
+      LatLng: { latitude: LatLng.latitude, longitude: LatLng.longitude },
+      address: { city },
+    };
   } catch (error) {
     console.error(error);
   }
