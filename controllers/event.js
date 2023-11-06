@@ -380,6 +380,62 @@ const replyComment = async (req, res) => {
   }
 };
 
+const deleteComment = async (req, res) => {
+  const userId = req.user._id;
+  const { eventId, commentId } = req.params;
+
+  try {
+    const findUserComment = await Event.findOne({ _id: eventId });
+    if (findUserComment.eventComment[0].userId.equals(userId)) {
+      const eventComments = await Event.findOneAndUpdate(
+        { _id: eventId, "eventComment.userId": userId },
+        { $pull: { eventComment: { _id: commentId } } },
+        { new: true }
+      );
+      if (!eventComments) {
+        return res
+          .status(401)
+          .json({ msg: "Not possible to remove the comment" });
+      }
+
+      res.status(200).json(eventComments);
+    } else {
+      res.status(200).json({ msg: "You are not permitted to delete comment" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const deleteCommentReply = async (req, res) => {
+  const userId = req.user._id;
+  const { eventId, commentId, replyId } = req.params;
+
+  try {
+    const findUserComment = await Event.findOne({ _id: eventId });
+
+    if (findUserComment.eventComment[0].userId.equals(userId)) {
+      const commentReply = await Event.findOneAndUpdate(
+        {
+          _id: eventId,
+          "eventComment._id": commentId,
+          "eventComment.replies._id": replyId,
+          "eventComment.userId": userId,
+        },
+        { $pull: { "eventComment.$.replies": { _id: replyId } } },
+        { new: true }
+      );
+      res.status(200).json(commentReply);
+    } else {
+      res
+        .status(200)
+        .json({ msg: "You are not permitted to delete reply comment" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   createEvent,
   getAllEvents,
@@ -391,4 +447,6 @@ module.exports = {
   getEventsInArea,
   createComment,
   replyComment,
+  deleteComment,
+  deleteCommentReply,
 };
