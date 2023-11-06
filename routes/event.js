@@ -14,9 +14,10 @@ const {
   addUserToAttendedEvent,
   getEventsInArea,
   createComment,
+  editComment,
   replyComment,
   deleteComment,
-  deleteCommentReply
+  deleteCommentReply,
 } = require("../controllers/event");
 
 const app = express.Router();
@@ -29,8 +30,13 @@ app.get("/findEvent", getEventsInArea); //find event by city in query
 
 app.route("/:eventId").get(viewOneEvent).delete(checkAuth, deleteEvent);
 app.post("/:eventId/comment", requireAuth, createComment);
+app.put("/:eventId/comment/:commentId", checkAuth, editComment);
 app.delete("/:eventId/comment/:commentId", checkAuth, deleteComment);
-app.delete("/:eventId/comment/:commentId/replies/:replyId", checkAuth, deleteCommentReply)
+app.delete(
+  "/:eventId/comment/:commentId/replies/:replyId",
+  checkAuth,
+  deleteCommentReply
+);
 app.post("/:eventId/comment/:commentId/replies", checkAuth, replyComment);
 app.put("/like", requireAuth, addEventToInterested); //checks if user is authorized and only then can update interestedEvent's array
 //query example for above: http://localhost:8080/event/like?id=653679d494ad33f92f3ba768

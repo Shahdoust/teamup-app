@@ -337,6 +337,33 @@ const createComment = async (req, res) => {
   }
 };
 
+// Edit comment
+const editComment = async (req, res) => {
+  const editCommentDetails = req.body;
+  const userId = req.user._id;
+  const { eventId, commentId } = req.params;
+  try {
+    const findComment = await Event.findOne({ _id: eventId });
+
+    if (!findComment) {
+      return res.status(404).json({ msg: "The event not exist to edit" });
+    }
+    if (findComment.eventComment[0].userId.equals(userId)) {
+      findComment.eventComment[0].content =
+        editCommentDetails.eventComment[0].content;
+      await findComment.save();
+    } else {
+      return res
+        .status(400)
+        .json({ msg: "You are not permitted to edit comment" });
+    }
+
+    res.status(200).json({ msg: "Comment was successfully edited" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Reply to comment
 const replyComment = async (req, res) => {
   const replyCommentDetails = req.body;
@@ -446,6 +473,7 @@ module.exports = {
   addUserToAttendedEvent,
   getEventsInArea,
   createComment,
+  editComment,
   replyComment,
   deleteComment,
   deleteCommentReply,
