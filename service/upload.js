@@ -12,8 +12,22 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   folder: "app",
   allowedFormats: ["jpeg", "jpg", "png"],
-  transformation: [{ width: 500, height: 500, crop: "limit" }],
+  transformation: [
+    { gravity: "face", width: 400, height: 400, crop: "crop" },
+    { radius: "max" },
+    { width: 200, crop: "scale" },
+    { fetch_format: "auto" },
+  ],
 });
+
+cloudinary.image("*", {
+  transformation: [
+    { gravity: "face", height: 300, width: 300, crop: "fill" },
+    { fetch_format: "png" },
+    { radius: "max" },
+  ],
+});
+
 const upload = multer({ storage: storage });
 // console.log("upload", storage);
 

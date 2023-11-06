@@ -101,6 +101,88 @@ const editUserInfo = async (req, res) => {
   }
 };
 
+const editSportsFollowed = async (req, res) => {
+  const newSportsArray = req.body.interestedInSports;
+  const userId = req.params;
+  try {
+    let sportsToRemove = [];
+    let sportsToAdd = [];
+    const UserToUpdate = await User.findById(
+      { _id: userId.id }
+      // {
+      //   $pull: {
+      //     "userInfo.interestedInSports": newSportsArray.interestedInSports,
+      //   },
+      // }
+    );
+    console.log("old user info", UserToUpdate);
+    const oldArrayOfSports = UserToUpdate.userInfo.interestedInSports;
+
+    // Push all in array if it was empty
+    if (oldArrayOfSports.length == 0) {
+      const UserToUpdateArray = await User.findByIdAndUpdate(
+        { _id: userId.id },
+        {
+          $push: {
+            "userInfo.interestedInSports": newSportsArray,
+          },
+        }
+      );
+
+      await UserToUpdateArray.save();
+      return res.status(200).json({ UserToUpdateArray });
+    }
+
+    // Find sports to remove
+    for (const sport of oldArrayOfSports) {
+      if (newSportsArray.includes(sport)) {
+        sportsToRemove.push(sport);
+      }
+    }
+    console.log("sports to remove", sportsToRemove);
+
+    // Find sports to add
+    for (const sport of newSportsArray) {
+      if (!oldArrayOfSports.includes(sport)) {
+        sportsToAdd.push(sport);
+      }
+    }
+    console.log("sports to add", sportsToAdd);
+
+    // Remove sports from the user's array
+    if (sportsToRemove.length > 0) {
+      const userToRemoveSports = await User.findByIdAndUpdate(
+        { _id: userId.id },
+        {
+          $pull: { "userInfo.interestedInSports": { $in: sportsToRemove } },
+        },
+        { new: true }
+      );
+      await userToRemoveSports.save();
+    }
+
+    // Add sports to the user's array
+    if (sportsToAdd.length > 0) {
+      const userToAddSports = await User.findByIdAndUpdate(
+        { _id: userId.id },
+
+        {
+          $push: { "userInfo.interestedInSports": { $each: sportsToAdd } },
+        },
+        { new: true }
+      );
+      await userToAddSports.save();
+    }
+
+    const updatedUser = await User.findById({ _id: userId.id });
+    await UserToUpdate.save();
+    return res.status(200).json({ updatedUser });
+    // }
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+};
+
 const createUserCoordinates = async (req, res) => {
   const userId = req.params.id;
   const { city, country } = req.body;
@@ -314,4 +396,5 @@ module.exports = {
   submitUserRating,
   uploadImage,
   deleteUser,
+  editSportsFollowed,
 };
