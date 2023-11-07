@@ -94,6 +94,7 @@ const editUserInfo = async (req, res) => {
         },
         { new: true }
       );
+      await changeImageLink(updatedUser); //image transformation
       await updatedUser.save();
       res.status(200).json(updatedUser);
     }
@@ -256,7 +257,7 @@ const userSignUp = async (req, res) => {
     } else {
       token = createToken(user._id, user.username);
     }
-    changeImageLink();
+    await changeImageLink(updatedUser); //image transform
     res.status(200).json({ email: userInfo.email, token });
   } catch (error) {
     res.status(400).json({ error: error.message });
