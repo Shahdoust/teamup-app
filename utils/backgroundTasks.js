@@ -63,10 +63,10 @@ const scheduleEventStatusUpdates = async () => {
 
       if (eventTime) {
         const cronExpression = `* * * * *`;
-
-        cron.schedule(cronExpression, () => {
-          updateEventStatuses(event);
-        });
+        updateEventStatuses(event);
+        // cron.schedule(cronExpression, () => {
+        //   updateEventStatuses(event);
+        // });
       }
     });
   } catch (error) {
