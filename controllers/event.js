@@ -4,8 +4,6 @@ const User = require("../schemas/User");
 const { scheduleEventStatusUpdates } = require("../utils/backgroundTasks");
 const { fetchLocationEvent } = require("../utils/location");
 
-scheduleEventStatusUpdates();
-
 // Create event for specific sport
 const createEvent = async (req, res) => {
   try {
@@ -59,6 +57,8 @@ const createEvent = async (req, res) => {
 // Get all events creator
 const getAllEvents = async (req, res) => {
   try {
+    //Check all events status
+    scheduleEventStatusUpdates();
     const events = await Event.find().populate("organizator", [
       "username",
       "userInfo.userImage",
