@@ -126,7 +126,12 @@ userSchema.statics.signup = async function (userInfo) {
     throw Error("Email is already in use");
   }
 
-  if (!userInfo.email || !userInfo.password || !userInfo.username) {
+  if (
+    !userInfo.email ||
+    !userInfo.password ||
+    !userInfo.username ||
+    !userInfo.languagesSpoken
+  ) {
     throw Error("Fill out all the fields");
   }
   if (!validator.isEmail(userInfo.email)) {
@@ -158,21 +163,6 @@ userSchema.statics.signup = async function (userInfo) {
     },
   });
   return user;
-  // } else {
-  // const salt = await bcrypt.genSalt();
-  // const hash = await bcrypt.hash(userInfo.password, salt);
-  // const user = await this.create({
-  //   email: userInfo.email,
-  //   password: hash,
-  //   username: userInfo.username,
-  // userInfo: {
-  //   description: userInfo.description,
-  //   userImage: userInfo.userImage,
-  //   languagesSpoken: userInfo.languagesSpoken,
-  // },
-  // });
-  // return user;
-  // }
 };
 
 // static custom login method
@@ -188,15 +178,10 @@ userSchema.statics.login = async function (email, password) {
   }
 
   const match = await bcrypt.compare(password, user.password);
-  // const match = await password.localeCompare(user.password);
-  //this need to be changed to like 125 when signin works
 
   if (!match) {
     throw Error("Incorrect password");
   }
-  // if (match !== 0) {
-  //   throw Error("Incorrect password"); //this also
-  // }
 
   return user;
 };
