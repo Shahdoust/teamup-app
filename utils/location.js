@@ -45,7 +45,7 @@ const userLocation = async (city, country) => {
     const apiResponse = await axios.get(
       `http://dev.virtualearth.net/REST/v1/Locations?q=${encodeURIComponent(
         locationQuery
-      )}&key=${process.env.API_KEY}`
+      )}&key=${process.env.API_KEY_MAP}`
     );
     const coordinates = apiResponse.data.resourceSets[0].resources[0].point;
     return {
