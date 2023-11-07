@@ -16,7 +16,10 @@ const {
 } = require("../controllers/user");
 const checkToken = require("../middlewares/checkAuth");
 const upload = require("../service/upload");
+// const changeImageLink = require("../utils/imageTransformation");
 const app = express.Router();
+// app.get("/image", );
+
 app.post("/signup", upload.single("picture"), userSignUp);
 // app.post("/signup", upload.single("picture"), uploadImage);
 // console.log(upload.single());
