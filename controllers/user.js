@@ -183,6 +183,31 @@ const editSportsFollowed = async (req, res) => {
   }
 };
 
+const deleteSport = async (req, res) => {
+  const userId = req.params.userId;
+  const sportIndex = req.params.sportIndex;
+
+  try {
+    const user = await User.findById(userId);
+
+    const deleteOneSport = user.userInfo.interestedInSports.splice(
+      sportIndex,
+      1
+    );
+    if (!user.userInfo.interestedInSports[sportIndex]) {
+      return res
+        .status(401)
+        .json({ msg: `The is no index sport ${sportIndex} in the list` });
+    }
+    await user.save();
+    res.status(200).json({
+      msg: `Sport ${user.userInfo.interestedInSports[sportIndex]} deleted from list`,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const createUserCoordinates = async (req, res) => {
   const userId = req.params.id;
   const { city, country } = req.body;
@@ -397,4 +422,5 @@ module.exports = {
   uploadImage,
   deleteUser,
   editSportsFollowed,
+  deleteSport,
 };
