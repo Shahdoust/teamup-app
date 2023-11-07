@@ -107,15 +107,7 @@ const editSportsFollowed = async (req, res) => {
   try {
     let sportsToRemove = [];
     let sportsToAdd = [];
-    const UserToUpdate = await User.findById(
-      { _id: userId.id }
-      // {
-      //   $pull: {
-      //     "userInfo.interestedInSports": newSportsArray.interestedInSports,
-      //   },
-      // }
-    );
-    console.log("old user info", UserToUpdate);
+    const UserToUpdate = await User.findById({ _id: userId.id });
     const oldArrayOfSports = UserToUpdate.userInfo.interestedInSports;
 
     // Push all in array if it was empty
@@ -139,7 +131,6 @@ const editSportsFollowed = async (req, res) => {
         sportsToRemove.push(sport);
       }
     }
-    console.log("sports to remove", sportsToRemove);
 
     // Find sports to add
     for (const sport of newSportsArray) {
@@ -147,7 +138,6 @@ const editSportsFollowed = async (req, res) => {
         sportsToAdd.push(sport);
       }
     }
-    console.log("sports to add", sportsToAdd);
 
     // Remove sports from the user's array
     if (sportsToRemove.length > 0) {
@@ -177,7 +167,6 @@ const editSportsFollowed = async (req, res) => {
     const updatedUser = await User.findById({ _id: userId.id });
     await UserToUpdate.save();
     return res.status(200).json({ updatedUser });
-    // }
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }
