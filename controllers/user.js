@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const { userLocation } = require("../utils/location");
 const { calculateAverageRating } = require("../utils/userRating");
+const { changeImageLink } = require("../utils/imageTransformation");
 
 const createToken = (_id, name, image) => {
   return jwt.sign({ _id, name, image }, process.env.SECRET, {
@@ -255,7 +256,7 @@ const userSignUp = async (req, res) => {
     } else {
       token = createToken(user._id, user.username);
     }
-
+    changeImageLink();
     res.status(200).json({ email: userInfo.email, token });
   } catch (error) {
     res.status(400).json({ error: error.message });
