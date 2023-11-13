@@ -407,13 +407,29 @@ const replyComment = async (req, res) => {
   }
 };
 
+// Function to check comment details to be deleted
+function checkComments(findUserComment, userId, commentId) {
+  let _isComment = false;
+  for (let comm = 0; comm < findUserComment.eventComment.length; comm++) {
+    if (commentId === findUserComment.eventComment[comm]._id.toString()) {
+      if (findUserComment.eventComment[comm].userId.equals(userId)) {
+        _isComment = true;
+        break;
+      }
+    }
+  }
+  return _isComment;
+}
+
+// Delete one comment
 const deleteComment = async (req, res) => {
   const userId = req.user._id;
   const { eventId, commentId } = req.params;
 
   try {
     const findUserComment = await Event.findOne({ _id: eventId });
-    if (findUserComment.eventComment[0].userId.equals(userId)) {
+    const _isComment = checkComments(findUserComment, userId, commentId);
+    if (_isComment) {
       const eventComments = await Event.findOneAndUpdate(
         { _id: eventId, "eventComment.userId": userId },
         { $pull: { eventComment: { _id: commentId } } },
@@ -434,6 +450,7 @@ const deleteComment = async (req, res) => {
   }
 };
 
+// Delete one reply of comment
 const deleteCommentReply = async (req, res) => {
   const userId = req.user._id;
   const { eventId, commentId, replyId } = req.params;
@@ -441,13 +458,13 @@ const deleteCommentReply = async (req, res) => {
   try {
     const findUserComment = await Event.findOne({ _id: eventId });
 
-    if (findUserComment.eventComment[0].userId.equals(userId)) {
+    const _isComment = checkComments(findUserComment, userId, commentId);
+    if (_isComment) {
       const commentReply = await Event.findOneAndUpdate(
         {
           _id: eventId,
           "eventComment._id": commentId,
           "eventComment.replies._id": replyId,
-          "eventComment.userId": userId,
         },
         { $pull: { "eventComment.$.replies": { _id: replyId } } },
         { new: true }
@@ -458,6 +475,8 @@ const deleteCommentReply = async (req, res) => {
         .status(200)
         .json({ msg: "You are not permitted to delete reply comment" });
     }
+
+    console.log(_isComment);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
