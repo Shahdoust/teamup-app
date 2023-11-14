@@ -428,8 +428,10 @@ const deleteComment = async (req, res) => {
 
   try {
     const findUserComment = await Event.findOne({ _id: eventId });
+
+    //TODO: remove the function checkComments
     const _isComment = checkComments(findUserComment, userId, commentId);
-    if (_isComment) {
+    if (findUserComment) {
       const eventComments = await Event.findOneAndUpdate(
         { _id: eventId, "eventComment.userId": userId },
         { $pull: { eventComment: { _id: commentId } } },
@@ -438,7 +440,7 @@ const deleteComment = async (req, res) => {
       if (!eventComments) {
         return res
           .status(401)
-          .json({ msg: "Not possible to remove the comment" });
+          .json({ msg: "Not possible to remove the comment (not permitted)" });
       }
 
       res.status(200).json(eventComments);
@@ -458,25 +460,29 @@ const deleteCommentReply = async (req, res) => {
   try {
     const findUserComment = await Event.findOne({ _id: eventId });
 
+    //TODO: remove the function checkComments
     const _isComment = checkComments(findUserComment, userId, commentId);
-    if (_isComment) {
+    if (findUserComment) {
       const commentReply = await Event.findOneAndUpdate(
         {
           _id: eventId,
-          "eventComment._id": commentId,
+          "eventComment.replies.userId": userId,
           "eventComment.replies._id": replyId,
         },
         { $pull: { "eventComment.$.replies": { _id: replyId } } },
         { new: true }
       );
+      if (!commentReply) {
+        return res.status(401).json({
+          msg: "Not possible to remove the reply comment (not permitted)",
+        });
+      }
       res.status(200).json(commentReply);
     } else {
       res
         .status(200)
         .json({ msg: "You are not permitted to delete reply comment" });
     }
-
-    console.log(_isComment);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
